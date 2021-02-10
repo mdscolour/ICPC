@@ -1,0 +1,11 @@
+for ncps in {3..9..2}
+do
+    echo $ncps
+    ./a.out $ncps
+    #cp ./ncxxx_nmyyy_pro_itp.sh ./nc${ncps}.sh
+    #sed -i "s/xxx/${ncps}/g" ./nc${ncps}.sh
+    #qsub ./nc${ncps}.sh
+    #rm ./nc${ncps}.sh
+done
+
+
