@@ -20,9 +20,9 @@ sprintf(midname, "chr2-%s.midconfig", itarea);
 sprintf(highname, "chr2-%s.highconfig", itarea);
 
 char buffer[50]; //only storage for 256 characters.
-sprintf(buffer, "potHCM2%f.LJpot",outer_define1); 
+sprintf(buffer, "potSAM2%f.LJpot",outer_define1); 
 
-SAMethod2(grname,midname,buffer);
+HCMethod2(grname,midname,buffer);
     
 return 0; 
 } 

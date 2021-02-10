@@ -907,6 +907,76 @@ class classAnneal
 
 };
 
+class classHillClimb
+{
+    public:
+        vector<double> oldpara;
+        vector<double> newpara;
+        vector<double> bestpara;
+        vector<double> vRndSize;
+        double energy;
+        //bool digitFlag=true;
+        void readyToRun(const char* tag,const char* cog,vector<double> toldpara,vector<double> tvRndSize)
+        {
+            coreDirectRun::loadTarget(tag);
+            coreDirectRun::readConfig(cog);
+            coreDirectRun::readyToRun();
+            oldpara.clear();oldpara.assign(toldpara.begin(), toldpara.end());
+            newpara.clear();newpara.assign(toldpara.begin(), toldpara.end());
+            bestpara.clear();bestpara.assign(toldpara.begin(), toldpara.end());
+            energy = 99999;
+            vRndSize.clear();vRndSize.assign(tvRndSize.begin(), tvRndSize.end());
+            //digitFlag = true;
+        }
+
+        vector<double> climb(const char* name="potparaAll.HCpot")
+        {
+            double new_E;
+            FILE *fptr;
+            fptr = fopen(name, "w");
+            int runcount = 0;
+            while(true)
+            {
+            energy = coreDirectRun::assignAndRun(oldpara[0],oldpara[1],oldpara[2],oldpara[3]);
+
+            ////// block search
+            // for(int i1=-vRndSize[0];i1<=vRndSize[0];i1++)
+            // for(int i2=-vRndSize[1];i2<=vRndSize[1];i2++)
+            // for(int i3=-vRndSize[2];i3<=vRndSize[2];i3++)
+            // for(int i4=-vRndSize[3];i4<=vRndSize[3];i4++)
+            // {
+            //     //if(i1==0&&i2==0&&i3==0&&i4==0)continue;
+            //     newpara.clear();
+            //     newpara.push_back(oldpara[0]+i1);
+            //     newpara.push_back(oldpara[1]+i2);
+            //     newpara.push_back(oldpara[2]+i3);
+            //     newpara.push_back(oldpara[3]+i4);
+            ///// line search
+            for(int ip=0;ip<4;ip++)
+            for(int add=-vRndSize[ip];add<=vRndSize[ip];add++)
+            {
+                if(add==0)continue;
+                newpara[ip] += add;
+
+                new_E = coreDirectRun::assignAndRun(newpara[0],newpara[1],newpara[2],newpara[3]);
+                if(new_E <= energy)
+                {
+                    energy = new_E;
+                    bestpara = newpara;
+                }
+                newpara[ip] = oldpara[ip];
+            }
+                
+            fprintf(fptr, "%f %.5f %.5f %.5f %.5f %.5f\n",float(runcount),bestpara[0],bestpara[1],bestpara[2],bestpara[3],energy);
+            //printf("%e %.5f %.5f %.5f %.5f,%.5f\n",T,oldpara[0],oldpara[1],oldpara[2],oldpara[3],energy);
+            if(bestpara == oldpara)break;
+            oldpara = bestpara;
+            runcount++;
+            }//// end while
+            fclose(fptr);
+            return oldpara;
+        }
+};
 
 //void readyToRun(const char* tag,const char* cog,vector<double> toldpara,vector<double> tvRndSize)
 //vector<double> anneal(double T,double T_min,double lambda,int SAcount_max,const char* name="potparaAll.SApot")
@@ -1046,3 +1116,54 @@ const char* midname="config.midconfig",const char* savenam="potparaAll.SApot")
 // printfVector(best);
 }
 
+void HCMethod1(double a,double b,const char* tagnam="targetGr.gr",
+const char* lowname="config.midconfig",const char* savenam="potparaAll.SApot")
+{
+    classHillClimb* hill;
+    hill = new classHillClimb();
+    //char buffer[50];
+    vector<double> told,tsiz;
+    //vector<vector<double>> recPara = {};
+    vector<double> tmpPara = {};
+
+    //for(double a=2;a<19;a++)
+    //for(double b=1;b<a;b++)
+    if(true)
+    {
+        //sprintf(buffer, "potSAM1%d_%d.LJpot",int(a),int(b));
+        delete hill;
+        hill = new classHillClimb();
+        told = {180.,10,a,b};
+        tsiz = {15.,3.,0.0,0.0};//// 0 will keep the value fixed
+        
+        hill->readyToRun(tagnam,lowname,told,tsiz);
+        //hill->digitFlag=true;
+        tmpPara = hill->climb(savenam);
+    }
+}
+
+void HCMethod2(const char* tagnam="targetGr.gr",
+const char* midname="config.midconfig",const char* savenam="potparaAll.SApot")
+{
+    classHillClimb* hill;
+    hill = new classHillClimb();
+    vector<double> told,tsiz;
+    vector<double> tmpPara = {};
+
+    //for(double nrep=0;nrep<20;nrep++)
+    if(true)
+    {
+        delete hill;
+        hill = new classHillClimb();
+        tsiz = {15.,3.,3.,3.};
+        told.clear();
+        told.push_back(int((230-130)*RNG_NAME()+130));
+        told.push_back(int((20-1)*RNG_NAME()+1));
+        told.push_back(int((20-1)*RNG_NAME()+1));
+        told.push_back(int((20-1)*RNG_NAME()+1));
+        
+        hill->readyToRun(tagnam,midname,told,tsiz);
+        //hill->digitFlag=false;
+        tmpPara = hill->climb(savenam);
+    }
+}
