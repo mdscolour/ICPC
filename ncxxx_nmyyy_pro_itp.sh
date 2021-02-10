@@ -7,15 +7,16 @@
 
 echo "START_TIME           = `date +'%y-%m-%d %H:%M:%S %s'`"
 
-tdr=SAM2B_program3_xxx_yyy  # at least one xxx remain
+tdr=SAM1B_program3_xxx_yyy  # at least one xxx remain
 underWS=/remote/pi310b/li/MolecularMC/LJTestInt/reverseMC/
+# need to time walltime
 
 cptarget1=${underWS}/*.cpp
 cptarget2=${underWS}/*.h
 cptarget3=${underWS}/*config
 cptarget4=${underWS}/*gr
 
-cpback1=${underWS}/chr2-0LJSAM2B/
+cpback1=${underWS}/chr2-0LJSAM1B/
 #tdr=xxx_yyy_prolong
 
 # in case intermediate interruption
@@ -40,7 +41,7 @@ cp ${cptarget2} .
 cp ${cptarget3} .
 cp ${cptarget4} .
 
-g++ runSAM2.cpp
+g++ runSAM1B.cpp
 ./a.out 0 xxx
 
 ##### data transfer back

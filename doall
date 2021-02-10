@@ -1,4 +1,4 @@
-for ncps in {0..100..1}
+for ncps in {0..152..1}
 do
     echo $ncps
     #./a.out $ncps

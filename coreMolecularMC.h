@@ -968,6 +968,30 @@ const char* lowname="config.midconfig",const char* savenam="potparaAll.SApot")
 // printfVector(best);
 }
 
+void SAMethod1B(double a,double b,const char* tagnam="targetGr.gr",
+const char* lowname="config.midconfig",const char* savenam="potparaAll.SApot")
+{
+    classAnneal* ann;
+    ann = new classAnneal();
+    //char buffer[50];
+    vector<double> told,tsiz;
+    //vector<vector<double>> recPara = {};
+    vector<double> tmpPara = {};
+
+    if(true)
+    {
+        //sprintf(buffer, "potSAM1%d_%d.LJpot",int(a),int(b));
+        delete ann;
+        ann = new classAnneal();
+        told = {180.,10,a,b};
+        tsiz = {30.,3.,0.0,0.0};//// 0 will keep the value fixed
+        
+        ann->readyToRun(tagnam,lowname,told,tsiz);
+        ann->digitFlag=false;
+        tmpPara = ann->anneal(100,0.001,0.94,150,savenam);
+    }
+}
+
 void SAMethod2(const char* tagnam="targetGr.gr",
 const char* midname="config.midconfig",const char* savenam="potparaAll.SApot")
 {
