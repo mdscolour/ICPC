@@ -1,7 +1,7 @@
 //#include "/home/li/bin/coreMolecularMC.h"
 //#include "coreMolecularMC.h"
 //#include "/home/li/bin/coreMolecularMC.cpp"//only one instance
-#include "coreMolecularMC.cpp"//only one instance
+#include "coreMolecularMC.h"//only one instance
 
 
 double LJPotential(double r,double epsilon=1,double sigma=1) {
@@ -68,7 +68,7 @@ void computeMCError(double crit1,double crit2)
     //vector<int> list1 = {1,10,100,200,500,1000,5000};
     //vector<int> list2 = {100,500,800};
     vector<int> list1 = {10};
-    vector<int> list2 = {50000};
+    vector<int> list2 = {500,1000,10000};
     vector<vector<double>> recAll={};
     int repeat=1;
     
@@ -364,19 +364,20 @@ int main(int argc,char *argv[])
 SeedByTime();
 
 char prename[50];
-char lowname[50];
-char highname[50];
+char lowname[50];char midname[50];char highname[50];
+FILE *fptr;
 char* itarea;
 if(argc>=2) itarea=(argv[1]);
 
-//sprintf(prename, "chr2-%s.preconfig", itarea);
-sprintf(prename, "config.config");
-//sprintf(lowname, "chr2-%s.lowconfig", itarea);
-sprintf(lowname, "%s.lowconfig", itarea);
-//sprintf(highname, "chr2-%s.highconfig", itarea);
-sprintf(highname, "%s.highconfig", itarea);
+sprintf(prename, "chr2-%s.preconfig", itarea);
+//sprintf(prename, "chr2-0.preconfig");
+sprintf(lowname, "chr2-%s.lowconfig", itarea);
+//sprintf(lowname, "%s.lowconfig", itarea);
+sprintf(midname, "chr2-%s.midconfig", itarea);
+//sprintf(lowname, "%s.lowconfig", itarea);
+sprintf(highname, "chr2-%s.highconfig", itarea);
+//sprintf(highname, "%s.highconfig", itarea);
 
-FILE *fptr;
 fptr = fopen(prename, "r");
 fscanf(fptr, "global_boxl:%lf\n", &global_boxl);
 fscanf(fptr, "global_boxr:%lf\n", &global_boxr);
@@ -398,9 +399,9 @@ findStepSize();
 //global_scaling=162;
 //generateStandardGr();
 //computeMCSteps();
-global_init_step=500;
-computeMCError(1.0,0.2);
-computeInitSteps();
+//global_init_step=500;
+//computeMCError(1.0,0.2);
+//computeInitSteps();
 
 //global_boxl=0;
 //global_boxr=15000;
@@ -416,21 +417,35 @@ computeInitSteps();
 //runWithGlobal();
 //double timediff = float(clock() - begin_time)/CLOCKS_PER_SEC;
 
-printf("Recommended (fast): scaling: %lf, num_configs: %d, num_steps: %d, init_step: %d , loop time: %lf \n",global_scaling,global_num_configs,global_num_steps,global_init_step,global_timediff);
-printf("Recommended (slow): scaling: %lf, num_configs: %d, num_steps: %d, init_step: %d , loop time: %lf \n",global_scaling,high_global_num_configs,high_global_num_steps,global_init_step,high_global_timediff);
+//printf("Recommended (fast): scaling: %lf, num_configs: %d, num_steps: %d, init_step: %d , loop time: %lf \n",global_scaling,global_num_configs,global_num_steps,global_init_step,global_timediff);
+//printf("Recommended (slow): scaling: %lf, num_configs: %d, num_steps: %d, init_step: %d , loop time: %lf \n",global_scaling,high_global_num_configs,high_global_num_steps,global_init_step,high_global_timediff);
 
 //FILE *fptr;
 fptr = fopen(lowname, "w");
+fprintf(fptr, "global_boxl:%lf\n", global_boxl/10);
+fprintf(fptr, "global_boxr:%lf\n", global_boxr/10.);
+fprintf(fptr, "global_npart:%d\n", int(global_npart/10));
+fprintf(fptr, "global_minvol:%lf\n", global_minvol);
+fprintf(fptr, "global_temperature:%lf\n", global_temperature);
+fprintf(fptr, "global_scaling:%lf\n", global_scaling);
+fprintf(fptr, "global_num_configs:%d\n", 500);
+fprintf(fptr, "global_num_steps:%d\n", 10);
+fprintf(fptr, "global_init_step:%d\n", 500);
+fprintf(fptr, "run time(s) for one loop:%lf\n",-1);
+fprintf(fptr, "global_para:%lf\n",global_LJpara);
+fclose(fptr);
+
+fptr = fopen(midname, "w");
 fprintf(fptr, "global_boxl:%lf\n", global_boxl);
 fprintf(fptr, "global_boxr:%lf\n", global_boxr);
 fprintf(fptr, "global_npart:%d\n", global_npart);
 fprintf(fptr, "global_minvol:%lf\n", global_minvol);
 fprintf(fptr, "global_temperature:%lf\n", global_temperature);
 fprintf(fptr, "global_scaling:%lf\n", global_scaling);
-fprintf(fptr, "global_num_configs:%d\n", global_num_configs);
-fprintf(fptr, "global_num_steps:%d\n", global_num_steps);
-fprintf(fptr, "global_init_step:%d\n", global_init_step);
-fprintf(fptr, "run time(s) for one loop:%lf\n",global_timediff);
+fprintf(fptr, "global_num_configs:%d\n", 10000);
+fprintf(fptr, "global_num_steps:%d\n", 10);
+fprintf(fptr, "global_init_step:%d\n", 500);
+fprintf(fptr, "run time(s) for one loop:%lf\n",-1);
 fprintf(fptr, "global_para:%lf\n",global_LJpara);
 fclose(fptr);
 
@@ -441,12 +456,26 @@ fprintf(fptr, "global_npart:%d\n", global_npart);
 fprintf(fptr, "global_minvol:%lf\n", global_minvol);
 fprintf(fptr, "global_temperature:%lf\n", global_temperature);
 fprintf(fptr, "global_scaling:%lf\n", global_scaling);
-fprintf(fptr, "global_num_configs:%d\n", high_global_num_configs);
-fprintf(fptr, "global_num_steps:%d\n", high_global_num_steps);
-fprintf(fptr, "global_init_step:%d\n", global_init_step);
-fprintf(fptr, "run time(s) for one loop:%lf\n",high_global_timediff);
+fprintf(fptr, "global_num_configs:%d\n", 100000);
+fprintf(fptr, "global_num_steps:%d\n", 10);
+fprintf(fptr, "global_init_step:%d\n", 500);
+fprintf(fptr, "run time(s) for one loop:%lf\n",-1);
 fprintf(fptr, "global_para:%lf\n",global_LJpara);
 fclose(fptr);
+
+// fptr = fopen(highname, "w");
+// fprintf(fptr, "global_boxl:%lf\n", global_boxl);
+// fprintf(fptr, "global_boxr:%lf\n", global_boxr);
+// fprintf(fptr, "global_npart:%d\n", global_npart);
+// fprintf(fptr, "global_minvol:%lf\n", global_minvol);
+// fprintf(fptr, "global_temperature:%lf\n", global_temperature);
+// fprintf(fptr, "global_scaling:%lf\n", global_scaling);
+// fprintf(fptr, "global_num_configs:%d\n", high_global_num_configs);
+// fprintf(fptr, "global_num_steps:%d\n", high_global_num_steps);
+// fprintf(fptr, "global_init_step:%d\n", global_init_step);
+// fprintf(fptr, "run time(s) for one loop:%lf\n",high_global_timediff);
+// fprintf(fptr, "global_para:%lf\n",global_LJpara);
+// fclose(fptr);
 
 
 

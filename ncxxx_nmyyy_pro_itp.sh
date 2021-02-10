@@ -2,20 +2,20 @@
 #PBS -q medium_buster
 #PBS -e ncxxx.errout
 #PBS -o ncxxx.resout
-#PBS -l walltime=20:00:00
+#PBS -l walltime=11:00:00
 #PBS -l mem=500mb,vmem=500mb
 
 echo "START_TIME           = `date +'%y-%m-%d %H:%M:%S %s'`"
 
-tdr=3LJTest_program3_xxx  # at least one xxx remain
-underWS=/remote/pi310b/li/MolecularMC/V0/3LJTest
+tdr=SAM2B_program3_xxx_yyy  # at least one xxx remain
+underWS=/remote/pi310b/li/MolecularMC/LJTestInt/reverseMC/
 
 cptarget1=${underWS}/*.cpp
 cptarget2=${underWS}/*.h
-cptarget3=${underWS}/*.config
-cptarget4=${underWS}/*.gr
+cptarget3=${underWS}/*config
+cptarget4=${underWS}/*gr
 
-cpback1=${underWS}
+cpback1=${underWS}/chr2-0LJSAM2B/
 #tdr=xxx_yyy_prolong
 
 # in case intermediate interruption
@@ -40,8 +40,8 @@ cp ${cptarget2} .
 cp ${cptarget3} .
 cp ${cptarget4} .
 
-g++ 3LJTest.cpp
-./a.out xxx
+g++ runSAM2.cpp
+./a.out 0 xxx
 
 ##### data transfer back
 #cp *.like_bed $cpback1

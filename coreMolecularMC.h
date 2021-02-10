@@ -518,7 +518,7 @@ public:
             return 99999;
         }
         savegr.clear();
-        savegr = runMMC()
+        savegr = runMMC();
         return getDiff(savegr);
     }
     static vector<double> runMMC()
@@ -643,7 +643,7 @@ public:
 
     ClassErSearch() {}
 
-    void doErSearch(double outer_define1,double outer_define2,
+    void doErSearch(double outer_define,
     const char* tag,const char* cog,const char* savenam)
     {
         coreDirectRun::loadTarget(tag);
@@ -654,8 +654,8 @@ public:
         //double outer_define; 
         //if(argc>=2)outer_define = atof(argv[1]);
         //else printf("Error, no outer input!\n");
-        ersearchymodel = {outer_define1,outer_define2, -99, -99}; //-99 refer to ersearchymid
-        ersearchymid = {-99, -99};
+        ersearchymodel = {outer_define,-99, -99, -99}; //-99 refer to ersearchymid
+        ersearchymid = {-99, -99, -99};
         vecval = arange(1, 19, 1);
         vnum = (int)vecval.size();
 
@@ -671,7 +671,7 @@ public:
         for(int i=0;i<ersearchymodel.size();i++)
         {
             if(ersearchymodel[i]!=-99){para.push_back(ersearchymodel[i]);}
-            else {para.push_back(ersearchmid[pcount]);pcount++;}
+            else {para.push_back(ersearchymid[pcount]);pcount++;}
         }
         double newp = coreDirectRun::assignAndRun(para[0],para[1],para[2],para[3]);
         fprintf(fptr, "%.5f %.5f %.5f %.5f %.5f %.5f\n",
@@ -710,7 +710,7 @@ public:
     {
         //set ersearchx and ersearchy in advance
         coreDirectRun::loadTarget("targetGr.gr");
-        coreMolecularMC MMC = coreMolecularMC(&erPotential, 1, 0.45);
+        coreMolecularMC MMC = coreMolecularMC(&coreTableRun::erPotential, 1, 0.45);
 
         MMC.setBox(0, 800);
         int npart = 200;
@@ -728,7 +728,7 @@ public:
         int ngr = int(coreDirectRun::targetX.size());
         double dx = coreDirectRun::dx;
         int lgr = int(double(ngr) * dx);
-        vector<double> gr = MMC.PARA_FUNC(ngr, dx);
+        vector<double> gr = MMC.getGr(ngr, dx);
 
         FILE *fptr;
         if (writeGr)
@@ -736,7 +736,7 @@ public:
         for (int i = 0; i < num_configs; i++)
         {
             MMC.run(num_steps);
-            VectorAddedByVector(gr, MMC.PARA_FUNC(ngr, dx));
+            VectorAddedByVector(gr, MMC.getGr(ngr, dx));
 
             if (writeGr)
             {
@@ -780,7 +780,7 @@ public:
             for (int k = 0; k < 4; k++)
                 para[k] = 19 * RNG_NAME() + 1;
             for (int j = 0; j < numx; j++)
-                coreTableRun::ersearchy.push_back(LJlike(ersearchx[j],
+                coreTableRun::ersearchy.push_back(LJlike(coreTableRun::ersearchx[j],
                                            para[0], para[1], para[2], para[3]));
             //ersearchy.push_back(0);
             if (numx != coreTableRun::ersearchy.size())
@@ -788,7 +788,7 @@ public:
 
             tgr = coreTableRun::runPotInput(1,40,100,0,15000,74,500,10,500,
                 int(coreDirectRun::targetX.size()),coreDirectRun::dx);
-            newp = coreDirectRun::getDiff(tgt);
+            newp = coreDirectRun::getDiff(tgr);
             if (newp <= bestp)
             {
                 bestpara = para;
@@ -810,6 +810,7 @@ class classAnneal
         vector<double> newpara;
         vector<double> vRndSize;
         double energy;
+        bool digitFlag=true;
         void readyToRun(const char* tag,const char* cog,vector<double> toldpara,vector<double> tvRndSize)
         {
             coreDirectRun::loadTarget(tag);
@@ -819,6 +820,7 @@ class classAnneal
             newpara = oldpara;
             energy = 99999;
             vRndSize.clear();vRndSize.assign(tvRndSize.begin(), tvRndSize.end());
+            //digitFlag = true;
         }
 
         vector<double> anneal(double T,double T_min,double lambda,int SAcount_max,
@@ -869,17 +871,35 @@ class classAnneal
         {
             //// parameter domains set manually
             vector<double> v2={};
-            if(vRndSize[0]==0)v2.push_back(v1[0]);
-            else v2.push_back( fPeriodRestrict(v1[0] + round(RNG_NAME() * (2*vRndSize[0])-vRndSize[0]),100,350));
-            
-            if(vRndSize[1]==0)v2.push_back(v1[1]);
-            else v2.push_back( fPeriodRestrict(v1[1] + round(RNG_NAME() * (2*vRndSize[1])-vRndSize[1]),1,30));
-            
-            if(vRndSize[2]==0)v2.push_back(v1[2]);
-            else v2.push_back( fPeriodRestrict(v1[2] + round(RNG_NAME() * (2*vRndSize[2])-vRndSize[2]),1,20));
-            
-            if(vRndSize[3]==0)v2.push_back(v1[3]);
-            else v2.push_back( fPeriodRestrict(v1[3] + round(RNG_NAME() * (2*vRndSize[3])-vRndSize[3]),1,20));
+            if(digitFlag)
+            {
+                if(vRndSize[0]==0)v2.push_back(v1[0]);
+                else v2.push_back( fPeriodRestrict(v1[0] + round(RNG_NAME() * (2*vRndSize[0])-vRndSize[0]),100,350));
+                
+                if(vRndSize[1]==0)v2.push_back(v1[1]);
+                else v2.push_back( fPeriodRestrict(v1[1] + round(RNG_NAME() * (2*vRndSize[1])-vRndSize[1]),1,30));
+                
+                if(vRndSize[2]==0)v2.push_back(v1[2]);
+                else v2.push_back( fPeriodRestrict(v1[2] + round(RNG_NAME() * (2*vRndSize[2])-vRndSize[2]),1,20));
+                
+                if(vRndSize[3]==0)v2.push_back(v1[3]);
+                else v2.push_back( fPeriodRestrict(v1[3] + round(RNG_NAME() * (2*vRndSize[3])-vRndSize[3]),1,20));
+            }
+            else
+            {
+                vector<double> v2={};
+                if(vRndSize[0]==0)v2.push_back(v1[0]);
+                else v2.push_back( fPeriodRestrict(v1[0] + (RNG_NAME() * (2*vRndSize[0])-vRndSize[0]),100,350));
+                
+                if(vRndSize[1]==0)v2.push_back(v1[1]);
+                else v2.push_back( fPeriodRestrict(v1[1] + (RNG_NAME() * (2*vRndSize[1])-vRndSize[1]),1,30));
+                
+                if(vRndSize[2]==0)v2.push_back(v1[2]);
+                else v2.push_back( fPeriodRestrict(v1[2] + (RNG_NAME() * (2*vRndSize[2])-vRndSize[2]),1,20));
+                
+                if(vRndSize[3]==0)v2.push_back(v1[3]);
+                else v2.push_back( fPeriodRestrict(v1[3] + (RNG_NAME() * (2*vRndSize[3])-vRndSize[3]),1,20));
+            }
             // v2.push_back(12);
             // v2.push_back(6);
             return v2;
@@ -907,10 +927,11 @@ const char* lowname="config.midconfig",const char* savenam="potparaAll.SApot")
         //sprintf(buffer, "potSAM1%d_%d.LJpot",int(a),int(b));
         delete ann;
         ann = new classAnneal();
-        told = {100.,1.0,a,b};
+        told = {180.,10,a,b};
         tsiz = {30.,3.,0.0,0.0};//// 0 will keep the value fixed
         
         ann->readyToRun(tagnam,lowname,told,tsiz);
+        ann->digitFlag=true;
         tmpPara = ann->anneal(100,0.001,0.94,150,savenam);
         //fprintf(fptr, "%.5f %.5f %.5f %.5f %.5f %.5f\n",
         //    0.0,tmpPara[0],tmpPara[1],tmpPara[2],tmpPara[3],ann->energy);
@@ -968,7 +989,8 @@ const char* midname="config.midconfig",const char* savenam="potparaAll.SApot")
         told.push_back(int((20-1)*RNG_NAME()+1));
         
         ann->readyToRun(tagnam,midname,told,tsiz);
-        tmpPara = ann->anneal(100,0.001,0.993,1500,savenam);
+        ann->digitFlag=false;
+        tmpPara = ann->anneal(100,0.001,0.98,500,savenam);
     }
 
 // coreDirectRun::loadTarget("standardLJTest.gr");
