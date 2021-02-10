@@ -250,7 +250,7 @@ void computeInitSteps()
     int num_configs=50;
     int num_steps=1;
 
-    coreDirectRun::loadTarget("standardGr.gr");
+    coreDirectRun::loadTarget("standardLJTest.gr");
     vector<int> list1 = {1,5,10,20,50,100,200,500};
     vector<int>  arrNewpOrd = {};
     for(int init_step: list1)
@@ -397,10 +397,10 @@ printf("LJpara is %lf\n",global_LJpara);
 findStepSize();
 //global_scaling=162;
 //generateStandardGr();
-computeInitSteps();
 //computeMCSteps();
-
+global_init_step=500;
 computeMCError(1.0,0.2);
+computeInitSteps();
 
 //global_boxl=0;
 //global_boxr=15000;
