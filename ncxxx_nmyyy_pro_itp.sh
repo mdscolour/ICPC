@@ -2,21 +2,22 @@
 #PBS -q medium_buster
 #PBS -e ncxxx.errout
 #PBS -o ncxxx.resout
-#PBS -l walltime=4:00:00
+#PBS -l walltime=15:00:00
 #PBS -l mem=400mb,vmem=400mb
 
 echo "START_TIME           = `date +'%y-%m-%d %H:%M:%S %s'`"
 
-tdr=ES1_program3_xxx_yyy  # at least one xxx remain
-underWS=/remote/pi310b/li/MolecularMC/LJTestInt/reverseMC/
+tdr=chr2-0_program1_xxx  # at least one xxx remain
+underWS=/remote/pi310b/li/MolecularMC/midgr/
 # need to time walltime
 
 cptarget1=${underWS}/*.cpp
 cptarget2=${underWS}/*.h
 cptarget3=${underWS}/*config
 cptarget4=${underWS}/*gr
+cptarget5=${underWS}/*.py
 
-cpback1=${underWS}/chr2-0ES1/
+cpback1=${underWS}/chr2-0/
 #tdr=xxx_yyy_prolong
 
 # in case intermediate interruption
@@ -40,10 +41,10 @@ cp ${cptarget1} .
 cp ${cptarget2} .
 cp ${cptarget3} .
 cp ${cptarget4} .
+cp ${cptarget5} .
 
 g++ -fPIC -shared -o cdll.so cdll.cpp
-g++ runES1.cpp
-./a.out 0 xxx
+./runMolecularMC.py 0 xxx
 
 ##### data transfer back
 #cp *.like_bed $cpback1

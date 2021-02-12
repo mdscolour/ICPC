@@ -15,7 +15,7 @@ extern "C" {
 //                     num_configs,num_steps,init_step,ngr,dx);}
 //     double c_getBest(int pos){return ClassErSearch::best[pos];}
 //     
-//     void c_SeedByTime(){SeedByTime();}
+     void c_SeedByTime(){SeedByTime();}
 //     void c_loadTarget(){coreDoubleRMC::loadTarget("targetGr.gr");}
 //     
 //     void c_xPrint(){printfVector(ClassErSearch::ersearchx);}

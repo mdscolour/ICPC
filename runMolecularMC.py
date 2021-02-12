@@ -181,7 +181,7 @@ class classAnneal:    oldpara = []
         self.newpara = copy.deepcopy(toldpara)
         self.energy = 99999
         self.vRndSize = tvRndSize
-        self.smrat = 100
+        self.smrat = 100## a smooth ratio of 100
         x,y = np.genfromtxt(tag).T
         self.targetY = smooth(y,self.smrat)
         
@@ -350,6 +350,7 @@ def abIndexing(pos):
                 return a,b
             abcount += 1
 if True:
+    lib.c_SeedByTime()
     #if sys.argv[1] == "dPair":
     #itarea="0"
     itarea = str(sys.argv[1])
@@ -362,6 +363,6 @@ if True:
     lowname="chr2-%s.lowconfig"%itarea
     midname="chr2-%s.midconfig"%itarea
     highname="chr2-%s.highconfig"%itarea
-    savnam="pypotSAM1f%.5f_%.5f.LJpot"%(outer_define1,outer_define2)
-    SAMethod1(outer_define1,outer_define2,grname,lowname,savnam)  
+    savnam="pypotSAM1f%d_%d.midpot"%(int(outer_define1),int(outer_define2))
+    SAMethod1(outer_define1,outer_define2,grname,midname,savnam)  
     
