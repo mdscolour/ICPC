@@ -2,12 +2,12 @@
 #PBS -q medium_buster
 #PBS -e ncxxx.errout
 #PBS -o ncxxx.resout
-#PBS -l walltime=11:00:00
-#PBS -l mem=500mb,vmem=500mb
+#PBS -l walltime=4:00:00
+#PBS -l mem=400mb,vmem=400mb
 
 echo "START_TIME           = `date +'%y-%m-%d %H:%M:%S %s'`"
 
-tdr=SAM1B_program3_xxx_yyy  # at least one xxx remain
+tdr=ES1_program3_xxx_yyy  # at least one xxx remain
 underWS=/remote/pi310b/li/MolecularMC/LJTestInt/reverseMC/
 # need to time walltime
 
@@ -16,7 +16,7 @@ cptarget2=${underWS}/*.h
 cptarget3=${underWS}/*config
 cptarget4=${underWS}/*gr
 
-cpback1=${underWS}/chr2-0LJSAM1B/
+cpback1=${underWS}/chr2-0ES1/
 #tdr=xxx_yyy_prolong
 
 # in case intermediate interruption
@@ -41,7 +41,8 @@ cp ${cptarget2} .
 cp ${cptarget3} .
 cp ${cptarget4} .
 
-g++ runSAM1B.cpp
+g++ -fPIC -shared -o cdll.so cdll.cpp
+g++ runES1.cpp
 ./a.out 0 xxx
 
 ##### data transfer back

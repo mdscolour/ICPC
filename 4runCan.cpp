@@ -1,7 +1,7 @@
 //#include "/home/li/bin/coreMolecularMC.h"
 //#include "coreMolecularMC.h"
 //#include "/home/li/bin/coreMolecularMC.cpp"//only one instance
-#include "../coreMolecularMC.h"//only one instance
+#include "coreMolecularMC.h"//only one instance
 
 int main(int argc,char *argv[])
 {    /**************  random seed  *******************************/
@@ -33,10 +33,10 @@ fptrwrite = fopen("pot.res", "w");
 int runcount = 0;
 while (fscanf(fptr, "%lf %lf %lf %lf %lf %lf\n", &tmp,&p1,&p2,&p3,&p4,&eng) == 6)
 {
-    cout<<(runcount)<<endl;
+    cout<<(runcount)<<"    ";
     if(runcount>=100000)break;
-    //printf("%lf %lf %lf %lf %lf %lf\n",tmp,p1,p2,p3,p4,eng);
     energy = coreDirectRun::assignAndRun(p1,p2,p3,p4);
+    printf("%lf %lf %lf %lf %lf %lf\n",tmp,p1,p2,p3,p4,energy);
     fprintf(fptrwrite, "%f %.5f %.5f %.5f %.5f %.5f\n",0,p1,p2,p3,p4,energy);
     if(energy<oldenergy)
     {
@@ -52,7 +52,7 @@ while (fscanf(fptr, "%lf %lf %lf %lf %lf %lf\n", &tmp,&p1,&p2,&p3,&p4,&eng) == 6
     runcount++;
 }
 fprintf(fptrwrite, "best is:\n");
-fprintf(fptrwrite, "%f %.5f %.5f %.5f %.5f %.5f\n",0,p1,p2,p3,p4,energy);
+fprintf(fptrwrite, "%f %.5f %.5f %.5f %.5f %.5f\n",0,best[0],best[1],best[2],best[3],energy);
 
 return 0; 
 } 

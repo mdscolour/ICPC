@@ -504,9 +504,21 @@ public:
         double sum = 0;
         for (int i = 0; i < numGr; i++)
             sum += pow(gr[i] - targetY[i], 2);
+        sum /=  (double(numGr));
+        
+//         double suml1 = 0;
+//         double smax = 0;
+//         double diff;
+//         for (int i = 0; i < numGr; i++)
+//             diff = fabs(gr[i] - targetY[i]);
+//             if(diff>smax)smax=diff;
+//             suml1 += diff;
+//         suml1 /= (double(numGr));
+//         printf("%lf %.8f %lf ",sum,suml1,smax);
+        
         //for(int i=0;i<numGr;i++)sum+=(gr[i]-targetY[i])*(gr[i]-targetY[i]);
-        return sum / (double(numGr));
-        //return sum;
+        //return sum / (double(numGr));
+        return sum;
     }
 
     static double runOne()
@@ -931,6 +943,8 @@ class classHillClimb
 
         vector<double> climb(const char* name="potparaAll.HCpot")
         {
+            printf("%f %.5f %.5f %.5f %.5f %.5f\n",-1.0,bestpara[0],bestpara[1],bestpara[2],bestpara[3],energy);
+                       
             double new_E;
             FILE *fptr;
             fptr = fopen(name, "w");
@@ -957,6 +971,7 @@ class classHillClimb
             {
                 if(add==0)continue;
                 newpara[ip] += add;
+                //printf("%.5f %.5f %.5f %.5f\n",newpara[0],newpara[1],newpara[2],newpara[3]);
 
                 new_E = coreDirectRun::assignAndRun(newpara[0],newpara[1],newpara[2],newpara[3]);
                 if(new_E <= energy)
@@ -968,7 +983,7 @@ class classHillClimb
             }
                 
             fprintf(fptr, "%f %.5f %.5f %.5f %.5f %.5f\n",float(runcount),bestpara[0],bestpara[1],bestpara[2],bestpara[3],energy);
-            //printf("%e %.5f %.5f %.5f %.5f,%.5f\n",T,oldpara[0],oldpara[1],oldpara[2],oldpara[3],energy);
+            printf("%f %.5f %.5f %.5f %.5f %.5f\n",float(runcount),bestpara[0],bestpara[1],bestpara[2],bestpara[3],energy);
             if(bestpara == oldpara)break;
             oldpara = bestpara;
             runcount++;
@@ -1134,7 +1149,7 @@ const char* lowname="config.midconfig",const char* savenam="potparaAll.SApot")
         delete hill;
         hill = new classHillClimb();
         told = {180.,10,a,b};
-        tsiz = {15.,3.,0.0,0.0};//// 0 will keep the value fixed
+        tsiz = {10,6,0.0,0.0};//// 0 will keep the value fixed
         
         hill->readyToRun(tagnam,lowname,told,tsiz);
         //hill->digitFlag=true;

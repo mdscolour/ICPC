@@ -15,16 +15,18 @@ if(argc>=2) itarea=(argv[1]);
 int abindex = atoi(argv[2]);
 int abcount=0;
 double outer_define1,outer_define2;
+bool tmpFlag = false;
 
 for(double a=2;a<19;a++)
 for(double b=1;b<a;b++)
 {
-    //cout<<a<<"  "<<b<<endl;
+    if(tmpFlag)break;
     outer_define1 = a;
     outer_define2 = b;
-    if(abcount==abindex)break; //total 152, if up to 18
+    if(abcount==abindex){tmpFlag=true;} //total 152, if up to 18
     abcount++;
 }
+cout<<abcount<<"    "<<outer_define1<<"  "<<outer_define2<<"  "<<abindex<<endl;
 
 sprintf(grname, "chr2-%s.LJgr", itarea);
 sprintf(lowname, "chr2-%s.lowconfig", itarea);

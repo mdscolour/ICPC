@@ -16,15 +16,15 @@ int abindex = atoi(argv[2]);
 int abcount=0;
 double outer_define1,outer_define2;
 
-for(double a=2;a<19;a++)
-for(double b=1;b<a;b++)
-{
-    //cout<<a<<"  "<<b<<endl;
-    outer_define1 = a;
-    outer_define2 = b;
-    if(abcount==abindex)break; //total 152
-    abcount++;
-}
+// for(double a=2;a<19;a++)
+// for(double b=1;b<a;b++)
+// {
+//     cout<<a<<"  "<<b<<endl;
+//     outer_define1 = a;
+//     outer_define2 = b;
+//     if(abcount==abindex)break; //total 152//wrong
+//     abcount++;
+// }
 
 sprintf(grname, "chr2-%s.LJgr", itarea);
 sprintf(lowname, "chr2-%s.lowconfig", itarea);
