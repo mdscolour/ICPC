@@ -67,32 +67,38 @@ public:
         }
         std::cout << '\n';
     }
-
     vector<double> getGr(int ngr = 160, double dx = 1)
     {
     vector<double> gr(ngr, 0.0);
     //double dismax = fabs(part[0] - part[npart-1]);
     double distemp;
     int indtemp;
+    int j;
     for (int i = 0; i < npart; i++)
     {
-        for (int j = 0; j < npart; j++)
+        for (int jadd = 1; jadd < npart; jadd++)
         {
-            distemp = fabs(part[i] - part[j]);
+            j = i+jadd;
+            if(j>=npart)j-=npart;
+
+            /// said that itself or its periodic one is far away
+            distemp = min(fabs(part[j] - part[i]),fabs(part[j] + box_s - part[i]));
             indtemp = (int)(ceil(distemp / dx)); //rounding up
             if (indtemp < ngr)
                 gr[indtemp] += 1.0; //i&j j&i twice
-            //else break;//only count until ngr*dx
+            else break;//only count until ngr*dx
+        }
+        for (int jadd = -1; jadd > -npart; jadd--)
+        {
+            j = i+jadd;
+            if(j<0)j+=npart;
 
-            /////periodic boundary condition
-            distemp = fabs(part[i] - part[j] + box_s);
+            /// said that itself or its periodic one is far away
+            distemp = min(fabs(part[j] - part[i]),fabs(part[j] - box_s - part[i]));
             indtemp = (int)(ceil(distemp / dx)); //rounding up
             if (indtemp < ngr)
-                gr[indtemp] += 1.0;
-            distemp = fabs(part[i] - part[j] - box_s);
-            indtemp = (int)(ceil(distemp / dx)); //rounding up
-            if (indtemp < ngr)
-                gr[indtemp] += 1.0;
+                gr[indtemp] += 1.0; //i&j j&i twice
+            else break;//only count until ngr*dx
         }
     }
     VectorDividedByScalar(gr, ((double)npart));
@@ -105,6 +111,44 @@ public:
     gr[1] = 0;
     return gr;
     }
+
+    // vector<double> getGr(int ngr = 160, double dx = 1)
+    // {
+    // vector<double> gr(ngr, 0.0);
+    // //double dismax = fabs(part[0] - part[npart-1]);
+    // double distemp;
+    // int indtemp;
+    // for (int i = 0; i < npart; i++)
+    // {
+    //     for (int j = 0; j < npart; j++)
+    //     {
+    //         distemp = fabs(part[i] - part[j]);
+    //         indtemp = (int)(ceil(distemp / dx)); //rounding up
+    //         if (indtemp < ngr)
+    //             gr[indtemp] += 1.0; //i&j j&i twice
+    //         //else break;//only count until ngr*dx
+
+    //         /////periodic boundary condition
+    //         distemp = fabs(part[i] - part[j] + box_s);
+    //         indtemp = (int)(ceil(distemp / dx)); //rounding up
+    //         if (indtemp < ngr)
+    //             gr[indtemp] += 1.0;
+    //         distemp = fabs(part[i] - part[j] - box_s);
+    //         indtemp = (int)(ceil(distemp / dx)); //rounding up
+    //         if (indtemp < ngr)
+    //             gr[indtemp] += 1.0;
+    //     }
+    // }
+    // VectorDividedByScalar(gr, ((double)npart));
+    // VectorDividedByScalar(gr, dx);
+    // VectorDividedByScalar(gr, 2.0 * (((double)npart) / box_s));
+    // //gr = gr/npart;
+    // //gr = gr/dx;
+    // //gr = gr/(npart/dismax);
+    // gr[0] = 0;
+    // gr[1] = 0;
+    // return gr;
+    // }
 
     double rollingCount(int pos, int rolsiz)
     {
