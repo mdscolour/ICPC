@@ -155,7 +155,7 @@ def fourInterface(xbin,*args):
     frng = np.linspace(-100,100,100)
     fftx = np.zeros(len(xbin))
     for t in range(len(xbin)):
-        fftx[t] = np.sum(fity*exp(2*np.pi*np.complex(0,1)*xbin[t]*frng)).real 
+        fftx[t] = np.sum(fity*exp(2*np.pi*np.complex(0,1)*xbin[t]*frng)).real
     #fftx /= getSurface(xbin,fftx)
     return fftx
 def fPeriodRestrict(x,begin,end):
@@ -184,20 +184,20 @@ class classAnneal:    oldpara = []
         self.smrat = 100## a smooth ratio of 100
         x,y = np.genfromtxt(tag).T
         self.targetY = smooth(y,self.smrat)
-        
+
     def getCurEnergy(self):
         ycal = []
         for i in range(len(self.targetY)):
             ycal.append(lib.c_getBestGr(i))
         ycal2 = smooth(ycal,self.smrat)
-        return np.mean((self.targetY-ycal2)**2)  
+        return np.mean((self.targetY-ycal2)**2)
     def anneal(self,T,T_min,plambda,SAcount_max,fname):
         SAcount = 0
         i=0
         apFlag = True
         new_E = 99999
         ressave= []
-           
+
         while(T>T_min and SAcount<SAcount_max):
             i = 0
             while(i<1):
@@ -249,7 +249,7 @@ class classAnneal:    oldpara = []
             else:
                 self.newpara[3]=fPeriodRestrict(
                 self.oldpara[3]+np.round(np.random.rand()*2*self.vRndSize[3]-
-                self.vRndSize[3]),1,20)   
+                self.vRndSize[3]),1,20)
         else:
             #print("test")
             if(self.vRndSize[0]==0):
@@ -275,16 +275,16 @@ class classAnneal:    oldpara = []
             else:
                 self.newpara[3]=fPeriodRestrict(
                 self.oldpara[3]+(np.random.rand()*2.*self.vRndSize[3]-
-                self.vRndSize[3]),1,20)     
+                self.vRndSize[3]),1,20)
 
-    
+
 
 def SAMethod1(a,b,tagnam,cogname,savenam):
     print(tagnam,"simulated annealing started:\n",pd.read_csv(cogname,index_col=None))
     #a,b = 12,6
     #for a in range(2,19):
     #    for b in range(1,a):
-    if True:    
+    if True:
         if True:
             ann = classAnneal()
             told = [180,10,a,b]
@@ -292,55 +292,68 @@ def SAMethod1(a,b,tagnam,cogname,savenam):
             ann.readyToRun(tagnam,cogname,told,tsiz)
             ann.digitFlag = False
             tmpPara = ann.anneal(100,0.001,0.993,1500,savenam)
-                    
-#if False:
-#    ###seed
-#    itarea="0"
-#    grname="chr2-%s.LJgr"%itarea
-#    lowname="chr2-%s.lowconfig"%itarea
-#    midname="chr2-%s.midconfig"%itarea
-#    highname="chr2-%s.highconfig"%itarea
-#    
-#    x,y = np.genfromtxt(grname).T
-#    ind = np.where(x==500)[0][0]
-#    x = x[:ind]
-#    y = y[:ind]
-#    y2 = smooth(y,100)
-#    
-#    lib.c_loadTarget(str.encode(grname))
-#    lib.c_readConfig(str.encode(lowname))
-#    lib.c_readyToRun()
-#    
-#    data = np.genfromtxt("chr2-0LJES10/pot.can").astype(float)
-#    res = []
-#    for idata in data:
-#        print(idata)
-#        energy = lib.c_assignAndRun(*idata[1:5])
-#        exit()
-#        #energy = lib.c_assignAndRun(163.0,2.0,15.,5.)
-#        ycal = []
-#        for i in range(len(x)):
-#            ycal.append(lib.c_getBestGr(i))
-#            ycal = ycal[:ind]
-#        
-#        ycal2 = smooth(ycal,100)
-#        res.append(np.mean((y2-ycal2)**2))
-#        print(res[-1])
-#    res=np.asarray(res)
-#    print(np.amin(res))
-#    #plot(x,y2,'.-',alpha=0.3)
-#    #plot(x,ycal2,'.-',alpha=0.3)
-#    #show()
-#    exit()
-#
-#    params_0=np.random.rand(200)
-#    print(len(params_0))
-#    popt, pcov = curve_fit(polyInterface, x, y, p0=params_0,maxfev=10000000)
-#    print(popt)
-#    plot(x,y,'.')
-#    plot(x,polyInterface(x,*popt),'.')
-#    ylim(0,8)
-#    show()
+
+def calCan(itarea):
+    ###seed
+    #itarea="0"
+    #itarea = str(sys.argv[2])
+    itarea = str(itarea)
+    grname="chr2-%s.midgr"%itarea
+    #lowname="chr2-%s.lowconfig"%itarea
+    midname="chr2-%s.midconfig"%itarea
+    #highname="chr2-%s.highconfig"%itarea
+    print(grname)
+
+    x,y = np.genfromtxt(grname).T
+    #ind = np.where(x==500)[0][0]
+    #x = x[:ind]
+    #y = y[:ind]
+    y2 = smooth(y,100)
+
+    lib.c_loadTarget(str.encode(grname))
+    lib.c_readConfig(str.encode(midname))
+    lib.c_readyToRun()
+
+    data = np.genfromtxt("chr2-%s/pot.can"%itarea).astype(float)
+    res = []
+    for idata in data:
+        #print(idata)
+        tmp = lib.c_assignAndRun(*idata[1:5])
+        #energy = lib.c_assignAndRun(163.0,2.0,15.,5.)
+        ycal = []
+        for i in range(len(x)):
+            ycal.append(lib.c_getBestGr(i))
+            #ycal = ycal[:ind]
+
+        ycal2 = smooth(ycal,100)
+        energy = np.mean((y2-ycal2)**2)
+        res.append([*idata[:-1],energy])
+        print(res[-1])
+
+    res=np.asarray(res)
+    best=[[0]*6]
+    best.append(res[np.argmin(res[:,-1]),:])
+    print(best[-1])
+    np.savetxt('./res/chr2-%s.res'%itarea, np.vstack((res,best)),fmt='%f')
+    print(grname[:-6],"done!")
+
+
+if sys.argv[1] == "calCan":
+    for i in range(14,15):
+        calCan(i)
+    #plot(x,y2,'.-',alpha=0.3)
+    #plot(x,ycal2,'.-',alpha=0.3)
+    #show()
+    exit()
+
+    params_0=np.random.rand(200)
+    print(len(params_0))
+    popt, pcov = curve_fit(polyInterface, x, y, p0=params_0,maxfev=10000000)
+    print(popt)
+    plot(x,y,'.')
+    plot(x,polyInterface(x,*popt),'.')
+    ylim(0,8)
+    show()
 def abIndexing(pos):
     abcount = 0
     for a in range(2,19):
@@ -349,14 +362,14 @@ def abIndexing(pos):
             if abcount == abindex:
                 return a,b
             abcount += 1
-if True:
+if False:
     lib.c_SeedByTime()
     #if sys.argv[1] == "dPair":
     #itarea="0"
     itarea = str(sys.argv[1])
     abindex = int(sys.argv[2])
     outer_define1,outer_define2 = abIndexing(abindex)  # 0-152
-    
+
     print("a,b:",outer_define1,outer_define2)
 
     grname="chr2-%s.midgr"%itarea###midgr or LJgr or ...
@@ -364,5 +377,5 @@ if True:
     midname="chr2-%s.midconfig"%itarea
     highname="chr2-%s.highconfig"%itarea
     savnam="pypotSAM1f%d_%d.midpot"%(int(outer_define1),int(outer_define2))
-    SAMethod1(outer_define1,outer_define2,grname,midname,savnam)  
-    
+    SAMethod1(outer_define1,outer_define2,grname,midname,savnam)
+
