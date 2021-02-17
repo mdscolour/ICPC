@@ -442,26 +442,26 @@ fprintf(fptr, "global_npart:%d\n", global_npart);
 fprintf(fptr, "global_minvol:%lf\n", global_minvol);
 fprintf(fptr, "global_temperature:%lf\n", global_temperature);
 fprintf(fptr, "global_scaling:%lf\n", global_scaling);
-fprintf(fptr, "global_num_configs:%d\n", 500);
+fprintf(fptr, "global_num_configs:%d\n", 5000);
 fprintf(fptr, "global_num_steps:%d\n", 10);
 fprintf(fptr, "global_init_step:%d\n", 500);
 fprintf(fptr, "run time(s) for one loop:%lf\n",-1);
 fprintf(fptr, "global_para:%lf\n",global_LJpara);
 fclose(fptr);
 
-// fptr = fopen(highname, "w");
-// fprintf(fptr, "global_boxl:%lf\n", global_boxl);
-// fprintf(fptr, "global_boxr:%lf\n", global_boxr);
-// fprintf(fptr, "global_npart:%d\n", global_npart);
-// fprintf(fptr, "global_minvol:%lf\n", global_minvol);
-// fprintf(fptr, "global_temperature:%lf\n", global_temperature);
-// fprintf(fptr, "global_scaling:%lf\n", global_scaling);
-// fprintf(fptr, "global_num_configs:%d\n", high_global_num_configs);
-// fprintf(fptr, "global_num_steps:%d\n", high_global_num_steps);
-// fprintf(fptr, "global_init_step:%d\n", global_init_step);
-// fprintf(fptr, "run time(s) for one loop:%lf\n",high_global_timediff);
-// fprintf(fptr, "global_para:%lf\n",global_LJpara);
-// fclose(fptr);
+fptr = fopen(highname, "w");
+fprintf(fptr, "global_boxl:%lf\n", global_boxl);
+fprintf(fptr, "global_boxr:%lf\n", global_boxr);
+fprintf(fptr, "global_npart:%d\n", global_npart);
+fprintf(fptr, "global_minvol:%lf\n", global_minvol);
+fprintf(fptr, "global_temperature:%lf\n", global_temperature);
+fprintf(fptr, "global_scaling:%lf\n", global_scaling);
+fprintf(fptr, "global_num_configs:%d\n", 100000);
+fprintf(fptr, "global_num_steps:%d\n", 10);
+fprintf(fptr, "global_init_step:%d\n", 1000);
+fprintf(fptr, "run time(s) for one loop:%lf\n",-1);
+fprintf(fptr, "global_para:%lf\n",global_LJpara);
+fclose(fptr);
 
 
 

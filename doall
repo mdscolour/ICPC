@@ -1,12 +1,12 @@
-for ncps in {0..152..1}
+for ncps in {0..14..1}
 do
     echo $ncps
     #mkdir chr2-${ncps}
-    #./a.out $ncps
-    cp ../ncxxx_nmyyy_pro_itp.sh ./nc${ncps}.sh
-    sed -i "s/xxx/${ncps}/g" ./nc${ncps}.sh
-    qsub ./nc${ncps}.sh
-    rm ./nc${ncps}.sh
+    ./a.out $ncps
+    #cp ../ncxxx_nmyyy_pro_itp.sh ./nc${ncps}.sh
+    #sed -i "s/xxx/${ncps}/g" ./nc${ncps}.sh
+    #qsub ./nc${ncps}.sh
+    #rm ./nc${ncps}.sh
 done
 
 

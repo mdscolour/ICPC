@@ -2,13 +2,13 @@
 #PBS -q medium_buster
 #PBS -e ncxxx.errout
 #PBS -o ncxxx.resout
-#PBS -l walltime=15:00:00
+#PBS -l walltime=1:00:00
 #PBS -l mem=400mb,vmem=400mb
 
 echo "START_TIME           = `date +'%y-%m-%d %H:%M:%S %s'`"
-
-tdr=chr2-0_program1_xxx  # at least one xxx remain
-underWS=/remote/pi310b/li/MolecularMC/midgr/
+ichr=4
+tdr=ES1newchr2-${ichr}_program1_xxx  # at least one xxx remain
+underWS=/remote/pi310b/li/MolecularMC/midES1new/
 # need to time walltime
 
 cptarget1=${underWS}/*.cpp
@@ -16,8 +16,9 @@ cptarget2=${underWS}/*.h
 cptarget3=${underWS}/*config
 cptarget4=${underWS}/*gr
 cptarget5=${underWS}/*.py
+cptarget6=${underWS}/chr2-${ichr}/pot.can
 
-cpback1=${underWS}/chr2-0/
+cpback1=${underWS}/chr2-${ichr}/
 #tdr=xxx_yyy_prolong
 
 # in case intermediate interruption
@@ -42,16 +43,18 @@ cp ${cptarget2} .
 cp ${cptarget3} .
 cp ${cptarget4} .
 cp ${cptarget5} .
+cp ${cptarget6} .
 
 g++ -fPIC -shared -o cdll.so cdll.cpp
-./runMolecularMC.py 0 xxx
+./runMolecularMC.py highCanPara ${ichr} xxx
 
 ##### data transfer back
 #cp *.like_bed $cpback1
 #cp *_ctcfbin $cpback1
 #cp *_ctcfbin47* $cpback1
-cp *pot $cpback1
-#cp alpha* $cpback1
+#cp *pot $cpback1
+cp *201res $cpback1
+cp *201gr $cpback1
 #cp _chrxxx.like_wig $cpback1
 #cp chrxxx $underWS
 #cp ../*.out $cpback1

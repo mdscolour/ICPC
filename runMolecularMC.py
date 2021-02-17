@@ -293,6 +293,88 @@ def SAMethod1(a,b,tagnam,cogname,savenam):
             ann.digitFlag = False
             tmpPara = ann.anneal(100,0.001,0.993,1500,savenam)
 
+def highCanParaFunc(itarea,iToCal):
+    itarea = str(itarea)
+    iToCal = int(iToCal)
+
+    grname="chr2-%s.midgr"%itarea
+    #lowname="chr2-%s.lowconfig"%itarea
+    midname="chr2-%s.midconfig"%itarea
+    #highname="chr2-%s.highconfig"%itarea
+    print(grname)
+
+    x,y = np.genfromtxt(grname).T
+    #ind = np.where(x==500)[0][0]
+    #x = x[:ind]
+    #y = y[:ind]
+    y2 = smooth(y,100)
+
+    lib.c_loadTarget(str.encode(grname))
+    lib.c_readConfig(str.encode(midname))
+    lib.c_readyToRun()
+
+    data = np.genfromtxt("chr2-%s/pot.can"%itarea).astype(float)
+    idata = data[iToCal,:]
+
+    tmp = lib.c_assignAndRun(*idata[1:5])
+    #energy = lib.c_assignAndRun(163.0,2.0,15.,5.)
+    ycal = []
+    for i in range(len(x)):
+        ycal.append(lib.c_getBestGr(i))
+        #ycal = ycal[:ind]
+
+    ycal2 = smooth(ycal,100)
+    energy = np.mean((y2-ycal2)**2)
+    res = [*idata[:-1],energy]
+
+    np.savetxt('rest/chr2-%s_%d.201res'%(itarea,iToCal),res,fmt='%f')
+    np.savetxt('rest/chr2-%s_%d.201gr'%(itarea,iToCal),ycal2,fmt='%f')
+    print(grname[:-6],"done!")
+if sys.argv[1] == "highCanPara":
+    ###seed
+    #itarea="0"
+    itarea = str(sys.argv[2])
+    iToCal = int(sys.argv[3])
+
+    grname="chr2-%s.midgr"%itarea
+    #lowname="chr2-%s.lowconfig"%itarea
+    #midname="chr2-%s.midconfig"%itarea
+    highname="chr2-%s.highconfig"%itarea
+    print(grname)
+
+    x,y = np.genfromtxt(grname).T
+    #ind = np.where(x==500)[0][0]
+    #x = x[:ind]
+    #y = y[:ind]
+    y2 = smooth(y,100)
+
+    lib.c_loadTarget(str.encode(grname))
+    lib.c_readConfig(str.encode(highname))
+    lib.c_readyToRun()
+
+    data = np.genfromtxt("pot.can").astype(float)
+    idata = data[iToCal,:]
+
+    tmp = lib.c_assignAndRun(*idata[1:5])
+    #energy = lib.c_assignAndRun(163.0,2.0,15.,5.)
+    ycal = []
+    for i in range(len(x)):
+        ycal.append(lib.c_getBestGr(i))
+        #ycal = ycal[:ind]
+
+    ycal2 = smooth(ycal,100)
+    energy = np.mean((y2-ycal2)**2)
+    res = [*idata[:-1],energy]
+
+    np.savetxt('chr2-%s_%d.201res'%(itarea,iToCal),res,fmt='%f')
+    np.savetxt('chr2-%s_%d.201gr'%(itarea,iToCal),ycal2,fmt='%f')
+    print(grname[:-6],"done!")
+    
+if sys.argv[1] == "highCanAll":
+    for i in range(0,15):
+        for j in range(0,201):
+            highCanParaFunc(i,j)
+            
 def calCan(itarea):
     ###seed
     #itarea="0"
@@ -378,4 +460,8 @@ if False:
     highname="chr2-%s.highconfig"%itarea
     savnam="pypotSAM1f%d_%d.midpot"%(int(outer_define1),int(outer_define2))
     SAMethod1(outer_define1,outer_define2,grname,midname,savnam)
+
+
+
+
 
