@@ -276,8 +276,178 @@ class classAnneal:    oldpara = []
                 self.newpara[3]=fPeriodRestrict(
                 self.oldpara[3]+(np.random.rand()*2.*self.vRndSize[3]-
                 self.vRndSize[3]),1,20)
+class classReverseMC:    oldpara = []
+    newpara = []
+    vRndSize = []
+    energy = 0
+    digitFlag = True
+    targetY = []
+    smrat = 0    def __init__(self):
+        pass
+    def readyToRun(self,tag,cog,toldpara,tvRndSize):
+        lib.c_loadTarget(str.encode(tag))
+        lib.c_readConfig(str.encode(cog))
+        lib.c_readyToRun()
+        self.oldpara = copy.deepcopy(toldpara)
+        self.newpara = copy.deepcopy(toldpara)
+        self.energy = 99999
+        self.vRndSize = tvRndSize
+        self.smrat = 100## a smooth ratio of 100
+        x,y = np.genfromtxt(tag).T
+        self.targetY = smooth(y,self.smrat)
 
+    def getCurEnergy(self):
+        ycal = []
+        for i in range(len(self.targetY)):
+            ycal.append(lib.c_getBestGr(i))
+        ycal2 = smooth(ycal,self.smrat)
+        return np.mean((self.targetY-ycal2)**2)
+    def reverseMC(self,T,SAcount_max,fname):
+        SAcount = 0
+        i=0
+        apFlag = True
+        new_E = 99999
+        ressave= []
 
+        while(SAcount<SAcount_max):
+            i = 0
+            while(i<1):
+                a = datetime.datetime.now()
+                lib.c_assignAndRun(*self.oldpara)
+                self.energy = self.getCurEnergy()
+                b = datetime.datetime.now()
+                print("aaa",(b-a))
+                exit()
+                self.updateNew()
+                lib.c_assignAndRun(*self.newpara)
+                new_E = self.getCurEnergy()
+                apFlag = self.acceptOrNot(self.energy,new_E,T)
+                if(apFlag):
+                    self.oldpara[:] = self.newpara[:]
+                    self.energy = new_E
+                i+=1
+                SAcount+=1
+            print(0,self.oldpara,self.energy)
+            ressave.append([T,self.oldpara[0],self.oldpara[1],self.oldpara[2],
+                self.oldpara[3],0])
+        besttmp = max(ressave,key=ressave.count)
+        ressave.append([0]*6)
+        ressave.append(besttmp)
+        np.savetxt(fname,ressave)
+        return besttmp
+    def acceptOrNot(self,oldp,newp,T):
+        if(newp<=oldp):
+            return True
+        if(np.random.rand()<np.exp((oldp-newp)/T)):
+            return True
+        return False
+    def updateNew(self):
+        if(self.digitFlag):
+            if(self.vRndSize[0]==0):
+                self.newpara[0]=self.oldpara[0]
+            else:
+                self.newpara[0]=fPeriodRestrict(
+                self.oldpara[0]+np.round(np.random.rand()*2*self.vRndSize[0]-
+                self.vRndSize[0]),100,350)
+            if(self.vRndSize[1]==0):
+                self.newpara[1]=self.oldpara[1]
+            else:
+                self.newpara[1]=fPeriodRestrict(
+                self.oldpara[1]+np.round(np.random.rand()*2*self.vRndSize[1]-
+                self.vRndSize[1]),1,30)
+            if(self.vRndSize[2]==0):
+                self.newpara[2]=self.oldpara[2]
+            else:
+                self.newpara[2]=fPeriodRestrict(
+                self.oldpara[2]+np.round(np.random.rand()*2*self.vRndSize[2]-
+                self.vRndSize[2]),1,20)
+            if(self.vRndSize[3]==0):
+                self.newpara[3]=self.oldpara[3]
+            else:
+                self.newpara[3]=fPeriodRestrict(
+                self.oldpara[3]+np.round(np.random.rand()*2*self.vRndSize[3]-
+                self.vRndSize[3]),1,20)
+        else:
+            #print("test")
+            if(self.vRndSize[0]==0):
+                self.newpara[0]=self.oldpara[0]
+            else:
+                self.newpara[0]=fPeriodRestrict(
+                self.oldpara[0]+(np.random.rand()*2.*self.vRndSize[0]-
+                self.vRndSize[0]),100,350)
+            if(self.vRndSize[1]==0):
+                self.newpara[1]=self.oldpara[1]
+            else:
+                self.newpara[1]=fPeriodRestrict(
+                self.oldpara[1]+(np.random.rand()*2.*self.vRndSize[1]-
+                self.vRndSize[1]),1,30)
+            if(self.vRndSize[2]==0):
+                self.newpara[2]=self.oldpara[2]
+            else:
+                self.newpara[2]=fPeriodRestrict(
+                self.oldpara[2]+(np.random.rand()*2.*self.vRndSize[2]-
+                self.vRndSize[2]),1,20)
+            if(self.vRndSize[3]==0):
+                self.newpara[3]=self.oldpara[3]
+            else:
+                self.newpara[3]=fPeriodRestrict(
+                self.oldpara[3]+(np.random.rand()*2.*self.vRndSize[3]-
+                self.vRndSize[3]),1,20)
+
+class classHillClimb:    oldpara = []
+    newpara = []
+    vRndSize = []
+    energy = 0
+    #digitFlag = True
+    targetY = []
+    smrat = 0    def __init__(self):
+        pass
+    def getCurEnergy(self):
+        ycal = []
+        for i in range(len(self.targetY)):
+            ycal.append(lib.c_getBestGr(i))
+        ycal2 = smooth(ycal,self.smrat)
+        return np.mean((self.targetY-ycal2)**2)
+    def readyToRun(self,tag,cog,toldpara,tvRndSize):
+        lib.c_loadTarget(str.encode(tag))
+        lib.c_readConfig(str.encode(cog))
+        lib.c_readyToRun()
+        self.oldpara = copy.deepcopy(toldpara)
+        self.newpara = copy.deepcopy(toldpara)
+        self.energy = 99999
+        self.vRndSize = tvRndSize
+        self.smrat = 100## a smooth ratio of 100
+        x,y = np.genfromtxt(tag).T
+        self.targetY = smooth(y,self.smrat)
+    def climb(self,name):
+        bestpara = np.zeros(len(self.oldpara))
+        bestpara[:] = self.oldpara[:]
+        runcount = 0
+        ressave = []
+        while(True):
+            runcount+=1
+            lib.c_assignAndRun(*self.oldpara)
+            self.energy = self.getCurEnergy()
+            
+            for ip in range(4):
+                for add in np.arange(-self.vRndSize[ip],self.vRndSize[ip]+1,1):
+                    if add==0:
+                        continue
+                    self.newpara[ip] += add
+                    lib.c_assignAndRun(*self.newpara)
+                    new_E = self.getCurEnergy()
+                    if new_E <= self.energy:
+                        self.energy = new_E
+                        bestpara[:] = self.newpara[:]
+                    self.newpara[:] = self.oldpara[:]
+            print(runcount,bestpara,self.energy)
+            ressave.append([runcount,bestpara[0],bestpara[1],bestpara[2],
+                bestpara[3],self.energy])
+            if np.allclose(bestpara,self.oldpara):
+                break
+            self.oldpara[:] = bestpara[:]      
+        np.savetxt(name,ressave)
+        return self.oldpara    
 
 def SAMethod1(a,b,tagnam,cogname,savenam):
     print(tagnam,"simulated annealing started:\n",pd.read_csv(cogname,index_col=None))
@@ -290,9 +460,33 @@ def SAMethod1(a,b,tagnam,cogname,savenam):
             told = [180,10,a,b]
             tsiz = [30,3,0,0]
             ann.readyToRun(tagnam,cogname,told,tsiz)
-            ann.digitFlag = False
+            ann.digitFlag = True
             tmpPara = ann.anneal(100,0.001,0.993,1500,savenam)
-
+def HCMethod1(a,b,tagnam,cogname,savenam):
+    print(tagnam,"hill climbing started:\n",pd.read_csv(cogname,index_col=None))
+    #a,b = 12,6
+    #for a in range(2,19):
+    #    for b in range(1,a):
+    if True:
+        if True:
+            hcm = classHillClimb()
+            told = [180,10,a,b]
+            tsiz = [10,6,0,0]
+            hcm.readyToRun(tagnam,cogname,told,tsiz)
+            tmpPara = hcm.climb(savenam)
+def MCMethod1(a,b,tagnam,cogname,savenam):
+    print(tagnam,"reverse Monte Carlo started:\n",pd.read_csv(cogname,index_col=None))
+    #a,b = 12,6
+    #for a in range(2,19):
+    #    for b in range(1,a):
+    if True:
+        if True:
+            crmc = classReverseMC()
+            told = [180,10,a,b]
+            tsiz = [10,6,0,0]
+            crmc.readyToRun(tagnam,cogname,told,tsiz)
+            tmpPara = crmc.reverseMC(1,1500,savenam)
+                        
 def highCanParaFunc(itarea,iToCal):
     itarea = str(itarea)
     iToCal = int(iToCal)
@@ -444,24 +638,54 @@ def abIndexing(pos):
             if abcount == abindex:
                 return a,b
             abcount += 1
-if False:
+if sys.argv[1] == "SAM1":
     lib.c_SeedByTime()
     #if sys.argv[1] == "dPair":
     #itarea="0"
-    itarea = str(sys.argv[1])
-    abindex = int(sys.argv[2])
+    itarea = str(sys.argv[2])
+    abindex = int(sys.argv[3])
     outer_define1,outer_define2 = abIndexing(abindex)  # 0-152
 
     print("a,b:",outer_define1,outer_define2)
 
-    grname="chr2-%s.midgr"%itarea###midgr or LJgr or ...
+    grname="chr2-%s.LJgr"%itarea###midgr or LJgr or ...
     lowname="chr2-%s.lowconfig"%itarea
     midname="chr2-%s.midconfig"%itarea
     highname="chr2-%s.highconfig"%itarea
-    savnam="pypotSAM1f%d_%d.midpot"%(int(outer_define1),int(outer_define2))
-    SAMethod1(outer_define1,outer_define2,grname,midname,savnam)
+    savnam="res/pypotSAM1%d_%d.midpot"%(int(outer_define1),int(outer_define2))
+    SAMethod1(outer_define1,outer_define2,grname,lowname,savnam)
+if sys.argv[1] == "HCM1":
+    lib.c_SeedByTime()
+    #if sys.argv[1] == "dPair":
+    #itarea="0"
+    itarea = str(sys.argv[2])
+    abindex = int(sys.argv[3])
+    outer_define1,outer_define2 = abIndexing(abindex)  # 0-152
 
+    print("a,b:",outer_define1,outer_define2)
 
+    grname="chr2-%s.LJgr"%itarea###midgr or LJgr or ...
+    lowname="chr2-%s.lowconfig"%itarea
+    midname="chr2-%s.midconfig"%itarea
+    highname="chr2-%s.highconfig"%itarea
+    savnam="res/pypotHCM1%d_%d.midpot"%(int(outer_define1),int(outer_define2))
+    HCMethod1(outer_define1,outer_define2,grname,lowname,savnam)
+if sys.argv[1] == "MCM1":
+    lib.c_SeedByTime()
+    #if sys.argv[1] == "dPair":
+    #itarea="0"
+    itarea = str(sys.argv[2])
+    abindex = int(sys.argv[3])
+    outer_define1,outer_define2 = abIndexing(abindex)  # 0-152
+
+    print("a,b:",outer_define1,outer_define2)
+
+    grname="chr2-%s.LJgr"%itarea###midgr or LJgr or ...
+    lowname="chr2-%s.lowconfig"%itarea
+    midname="chr2-%s.midconfig"%itarea
+    highname="chr2-%s.highconfig"%itarea
+    savnam="res/pypotMCM1%d_%d.midpot"%(int(outer_define1),int(outer_define2))
+    MCMethod1(outer_define1,outer_define2,grname,lowname,savnam)
 
 
 
