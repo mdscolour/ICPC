@@ -369,13 +369,13 @@ FILE *fptr;
 char* itarea;
 if(argc>=2) itarea=(argv[1]);
 
-sprintf(prename, "chr2-%s.preconfig", itarea);
+sprintf(prename, "chr4-%s.preconfig", itarea);
 //sprintf(prename, "chr2-0.preconfig");
-sprintf(lowname, "chr2-%s.lowconfig", itarea);
+sprintf(lowname, "chr4-%s.lowconfig", itarea);
 //sprintf(lowname, "%s.lowconfig", itarea);
-sprintf(midname, "chr2-%s.midconfig", itarea);
+sprintf(midname, "chr4-%s.midconfig", itarea);
 //sprintf(lowname, "%s.lowconfig", itarea);
-sprintf(highname, "chr2-%s.highconfig", itarea);
+sprintf(highname, "chr4-%s.highconfig", itarea);
 //sprintf(highname, "%s.highconfig", itarea);
 
 fptr = fopen(prename, "r");
@@ -422,9 +422,9 @@ findStepSize();
 
 //FILE *fptr;
 fptr = fopen(lowname, "w");
-fprintf(fptr, "global_boxl:%lf\n", global_boxl/10);
-fprintf(fptr, "global_boxr:%lf\n", global_boxr/10.);
-fprintf(fptr, "global_npart:%d\n", int(global_npart/10));
+fprintf(fptr, "global_boxl:%lf\n", global_boxl);
+fprintf(fptr, "global_boxr:%lf\n", global_boxr);
+fprintf(fptr, "global_npart:%d\n", int(global_npart));
 fprintf(fptr, "global_minvol:%lf\n", global_minvol);
 fprintf(fptr, "global_temperature:%lf\n", global_temperature);
 fprintf(fptr, "global_scaling:%lf\n", global_scaling);

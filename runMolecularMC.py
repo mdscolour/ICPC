@@ -336,10 +336,10 @@ if sys.argv[1] == "highCanPara":
     itarea = str(sys.argv[2])
     iToCal = int(sys.argv[3])
 
-    grname="chr2-%s.midgr"%itarea
+    grname="chr4-%s.midgr"%itarea
     #lowname="chr2-%s.lowconfig"%itarea
     #midname="chr2-%s.midconfig"%itarea
-    highname="chr2-%s.highconfig"%itarea
+    highname="chr4-%s.highconfig"%itarea
     print(grname)
 
     x,y = np.genfromtxt(grname).T
@@ -366,8 +366,8 @@ if sys.argv[1] == "highCanPara":
     energy = np.mean((y2-ycal2)**2)
     res = [*idata[:-1],energy]
 
-    np.savetxt('chr2-%s_%d.201res'%(itarea,iToCal),res,fmt='%f')
-    np.savetxt('chr2-%s_%d.201gr'%(itarea,iToCal),ycal2,fmt='%f')
+    np.savetxt('chr4-%s_%d.201res'%(itarea,iToCal),res,fmt='%f')
+    np.savetxt('chr4-%s_%d.201gr'%(itarea,iToCal),ycal2,fmt='%f')
     print(grname[:-6],"done!")
     
 if sys.argv[1] == "highCanAll":
