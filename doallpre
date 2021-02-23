@@ -1,0 +1,8 @@
+for ncps in {0..43..1}
+do
+    echo $ncps
+    mkdir chr2-${ncps}
+    #./a.out $ncps
+done
+
+

@@ -1,9 +1,9 @@
-for ncps in {100..200..1}
+for ncps in {0..43..1}
 do
     echo $ncps
     #mkdir chr4-${ncps}
     #./a.out $ncps
-    cp ../ncxxx_nmyyy_pro_itp.sh ./nc${ncps}.sh
+    cp ./HCM1_ncxxx_bwuni.sh ./nc${ncps}.sh
     sed -i "s/xxx/${ncps}/g" ./nc${ncps}.sh
     qsub ./nc${ncps}.sh
     rm ./nc${ncps}.sh

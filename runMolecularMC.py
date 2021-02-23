@@ -426,8 +426,12 @@ class classHillClimb:    oldpara = []
         ressave = []
         while(True):
             runcount+=1
+            
+            #start = time.time()
             lib.c_assignAndRun(*self.oldpara)
             self.energy = self.getCurEnergy()
+            #print(time.time()-start)
+            #exit()
             
             for ip in range(4):
                 for add in np.arange(-self.vRndSize[ip],self.vRndSize[ip]+1,1):
@@ -659,17 +663,21 @@ if sys.argv[1] == "HCM1":
     #if sys.argv[1] == "dPair":
     #itarea="0"
     itarea = str(sys.argv[2])
-    abindex = int(sys.argv[3])
-    outer_define1,outer_define2 = abIndexing(abindex)  # 0-152
-
-    print("a,b:",outer_define1,outer_define2)
-
-    grname="chr2-%s.LJgr"%itarea###midgr or LJgr or ...
+    #abindex = int(sys.argv[3])
+    
+    #outer_define1,outer_define2 = abIndexing(abindex)  # 0-152
+    grname="chr2-%s.midgr"%itarea###midgr or LJgr or ...
     lowname="chr2-%s.lowconfig"%itarea
     midname="chr2-%s.midconfig"%itarea
     highname="chr2-%s.highconfig"%itarea
-    savnam="res/pypotHCM1%d_%d.midpot"%(int(outer_define1),int(outer_define2))
-    HCMethod1(outer_define1,outer_define2,grname,lowname,savnam)
+    
+    for abindex in range(120):    #### 0 - 119, for power a from 2 to 16
+        outer_define1,outer_define2 = abIndexing(abindex)
+    
+        print("a,b:",outer_define1,outer_define2)
+    
+        savnam="pypotHCM1%d_%d.midpot"%(int(outer_define1),int(outer_define2))
+        HCMethod1(outer_define1,outer_define2,grname,lowname,savnam)
 if sys.argv[1] == "MCM1":
     lib.c_SeedByTime()
     #if sys.argv[1] == "dPair":
