@@ -635,7 +635,7 @@ def abIndexing(pos):
     for a in range(2,19):
         for b in range(1,a):
             #print(abcount,a,b)
-            if abcount == abindex:
+            if abcount == pos:
                 return a,b
             abcount += 1
 if sys.argv[1] == "SAM1":

@@ -1,5 +1,5 @@
 #include "MyLib.h"
-#define PARA_FUNC getGr
+//#define PARA_FUNC getGr
 #define ROLLING_SIZE 5000
 
 typedef double (*type_pot)(double);
@@ -76,25 +76,29 @@ public:
     int j;
     for (int i = 0; i < npart; i++)
     {
+        distemp = 0;
         for (int jadd = 1; jadd < npart; jadd++)
         {
             j = i+jadd;
             if(j>=npart)j-=npart;
 
             /// said that itself or its periodic one is far away
-            distemp = min(fabs(part[j] - part[i]),fabs(part[j] + box_s - part[i]));
+            //distemp = min(fabs(part[j] - part[i]),fabs(part[j] + box_s - part[i]));
+            distemp += disBck[j];
             indtemp = (int)(ceil(distemp / dx)); //rounding up
             if (indtemp < ngr)
                 gr[indtemp] += 1.0; //i&j j&i twice
             else break;//only count until ngr*dx
         }
+        distemp = 0;
         for (int jadd = -1; jadd > -npart; jadd--)
         {
             j = i+jadd;
             if(j<0)j+=npart;
 
             /// said that itself or its periodic one is far away
-            distemp = min(fabs(part[j] - part[i]),fabs(part[j] - box_s - part[i]));
+            //distemp = min(fabs(part[j] - part[i]),fabs(part[j] - box_s - part[i]));
+            distemp += disFor[j];
             indtemp = (int)(ceil(distemp / dx)); //rounding up
             if (indtemp < ngr)
                 gr[indtemp] += 1.0; //i&j j&i twice
@@ -370,16 +374,18 @@ public:
     bool runOne()
     {
     bool resFlag = false;
-    for (int count = 0; count < (npart * 0.8); count++)
+    //for (int count = 0; count < (npart * 0.8); count++)
+    for (int count = 0; count < 1; count++)
     {
         int ipart = Random_integer_uniform(0, npart);
 
         //if no space to move
-        //should return false normally but tolerate here to check system collapse or not,
+        //return false normally but could tolerate here to check system collapse or not,
         if ((disFor[ipart] + disBck[ipart]) <= 2 * minvol + PRECISION)
         {
-            continue;
-        } //tolerate here
+            return false;
+            //continue;
+        } //not tolerate here
 
         double prop = proposal(ipart);
 

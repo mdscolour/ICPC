@@ -1,7 +1,7 @@
 //#include "/home/li/bin/coreMolecularMC.h"
 //#include "coreMolecularMC.h"
 //#include "/home/li/bin/coreMolecularMC.cpp"//only one instance
-#include "coreMolecularMC.cpp"//only one instance
+#include "coreMolecularMC.h"//only one instance
 
 
 double LJPotential(double r,double epsilon=1,double sigma=1) {
@@ -24,22 +24,26 @@ SeedByTime();
 char grname[50];
 char lowname[50];
 char highname[50];
-char* itarea;
-itarea="0";
+char* itarea = new char[1];
+itarea[0]='0';
 
-sprintf(grname, "chr2-%s.midgr", itarea);
+sprintf(grname, "chr2-%s.LJgr", itarea);
 sprintf(lowname, "chr2-%s.lowconfig", itarea);
-sprintf(highname, "chr2-%s.highconfig", itarea);
+//sprintf(highname, "chr2-%s.highconfig", itarea);
 
 coreDirectRun::loadTarget(grname);
 coreDirectRun::readConfig(lowname);
 coreDirectRun::readyToRun();
 
-energy = coreDirectRun::assignAndRun(p1,p2,p3,p4);
+double energy = coreDirectRun::assignAndRun(162,3,12,6);
 
 vector<double> gr = coreDirectRun::savegr;
 
-    
+int ngr = int(coreDirectRun::targetX.size());
+double dx = coreDirectRun::dx;
+int lgr = int(double(ngr) * dx);
+        
+write2DVector("chr2-0.testLJgr", arange(0, lgr, dx), gr); 
     
     return 0; 
 } 
