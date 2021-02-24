@@ -536,9 +536,10 @@ def highCanParaFunc(itarea,iToCal):
     energy = np.mean((y2-ycal2)**2)
     res = [*idata[:-1],energy]
 
-    np.savetxt('rest/chr2-%s_%d.201res'%(itarea,iToCal),res,fmt='%f')
-    np.savetxt('rest/chr2-%s_%d.201gr'%(itarea,iToCal),ycal2,fmt='%f')
-    print(grname[:-6],"done!")
+    #np.savetxt('res/chr2-%s_%d.201res'%(itarea,iToCal),res,fmt='%f')
+    #np.savetxt('res/chr2-%s_%d.201gr'%(itarea,iToCal),ycal2,fmt='%f')
+    print(res,grname[:-6],"done!")
+    return res,ycal2
 if sys.argv[1] == "highCanPara":
     ###seed
     #itarea="0"
@@ -580,9 +581,15 @@ if sys.argv[1] == "highCanPara":
     print(grname[:-6],"done!")
 
 if sys.argv[1] == "highCanAll":
-    for i in range(0,15):
-        for j in range(0,201):
-            highCanParaFunc(i,j)
+    res = []
+    for i in range(2,3):
+        for j in range(0,1):
+            rest,grt = highCanParaFunc(i,j)
+            res.append(rest)
+        resarr=np.asarray(res)
+        res.append([0]*6)
+        res.append(res[np.argmin(resarr[:,-1])])
+        np.savetxt('res/chr2-%d.201res'%(i),res,fmt='%f')  
 
 def calCan(itarea):
     ###seed
