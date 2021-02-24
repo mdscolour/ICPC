@@ -1,16 +1,27 @@
 #! /remote/gpu05/anaconda3/bin/python3
 # -*- coding: utf-8 -*-
 
-#import sys
-#sys.path.append('/home/li/bin/')from ctypes import cdll
+import sys
+import copy
+import time
+#sys.path.append('/home/li/bin/')
+from ctypes import cdll
 from ctypes import *
-#import numpy as np
+import numpy as np
 #from pylab import *
 #from scipy.optimize import curve_fit
-from head import *
-import pandas as pd
-#### load the library lib = cdll.LoadLibrary('./cdll.so')
-lib.c_loadTarget.argtypes = [c_char_p]lib.c_readConfig.argtypes = [c_char_p]lib.c_getBestGr.argtypes = [c_int]
+#import pandas as pd
+
+def smooth(y, box_pts):
+    box = np.ones(box_pts)/box_pts
+    y_smooth = np.convolve(y, box, mode='same')
+    return y_smooth
+
+#### load the library
+lib = cdll.LoadLibrary('./cdll.so')
+lib.c_loadTarget.argtypes = [c_char_p]
+lib.c_readConfig.argtypes = [c_char_p]
+lib.c_getBestGr.argtypes = [c_int]
 lib.c_getBestGr.restype = c_double
 lib.c_assignAndRun.argtypes = [c_double,c_double,c_double,c_double]
 lib.c_assignAndRun.restype = c_double
@@ -426,13 +437,13 @@ class classHillClimb:    oldpara = []
         ressave = []
         while(True):
             runcount+=1
-            
+
             #start = time.time()
             lib.c_assignAndRun(*self.oldpara)
             self.energy = self.getCurEnergy()
             #print(time.time()-start)
             #exit()
-            
+
             for ip in range(4):
                 for add in np.arange(-self.vRndSize[ip],self.vRndSize[ip]+1,1):
                     if add==0:
@@ -449,12 +460,12 @@ class classHillClimb:    oldpara = []
                 bestpara[3],self.energy])
             if np.allclose(bestpara,self.oldpara):
                 break
-            self.oldpara[:] = bestpara[:]      
+            self.oldpara[:] = bestpara[:]
         np.savetxt(name,ressave)
-        return self.oldpara    
+        return self.oldpara
 
 def SAMethod1(a,b,tagnam,cogname,savenam):
-    print(tagnam,"simulated annealing started:\n",pd.read_csv(cogname,index_col=None))
+    print(tagnam,"simulated annealing started:\n")#,pd.read_csv(cogname,index_col=None))
     #a,b = 12,6
     #for a in range(2,19):
     #    for b in range(1,a):
@@ -467,7 +478,7 @@ def SAMethod1(a,b,tagnam,cogname,savenam):
             ann.digitFlag = True
             tmpPara = ann.anneal(100,0.001,0.993,1500,savenam)
 def HCMethod1(a,b,tagnam,cogname,savenam):
-    print(tagnam,"hill climbing started:\n",pd.read_csv(cogname,index_col=None))
+    print(tagnam,"hill climbing started:\n")#,pd.read_csv(cogname,index_col=None))
     #a,b = 12,6
     #for a in range(2,19):
     #    for b in range(1,a):
@@ -479,7 +490,7 @@ def HCMethod1(a,b,tagnam,cogname,savenam):
             hcm.readyToRun(tagnam,cogname,told,tsiz)
             tmpPara = hcm.climb(savenam)
 def MCMethod1(a,b,tagnam,cogname,savenam):
-    print(tagnam,"reverse Monte Carlo started:\n",pd.read_csv(cogname,index_col=None))
+    print(tagnam,"reverse Monte Carlo started:\n")#,pd.read_csv(cogname,index_col=None))
     #a,b = 12,6
     #for a in range(2,19):
     #    for b in range(1,a):
@@ -490,7 +501,7 @@ def MCMethod1(a,b,tagnam,cogname,savenam):
             tsiz = [10,6,0,0]
             crmc.readyToRun(tagnam,cogname,told,tsiz)
             tmpPara = crmc.reverseMC(1,1500,savenam)
-                        
+
 def highCanParaFunc(itarea,iToCal):
     itarea = str(itarea)
     iToCal = int(iToCal)
@@ -567,12 +578,12 @@ if sys.argv[1] == "highCanPara":
     np.savetxt('chr4-%s_%d.201res'%(itarea,iToCal),res,fmt='%f')
     np.savetxt('chr4-%s_%d.201gr'%(itarea,iToCal),ycal2,fmt='%f')
     print(grname[:-6],"done!")
-    
+
 if sys.argv[1] == "highCanAll":
     for i in range(0,15):
         for j in range(0,201):
             highCanParaFunc(i,j)
-            
+
 def calCan(itarea):
     ###seed
     #itarea="0"
@@ -664,18 +675,18 @@ if sys.argv[1] == "HCM1":
     #itarea="0"
     itarea = str(sys.argv[2])
     #abindex = int(sys.argv[3])
-    
+
     #outer_define1,outer_define2 = abIndexing(abindex)  # 0-152
     grname="chr2-%s.midgr"%itarea###midgr or LJgr or ...
     lowname="chr2-%s.lowconfig"%itarea
     midname="chr2-%s.midconfig"%itarea
     highname="chr2-%s.highconfig"%itarea
-    
+
     for abindex in range(120):    #### 0 - 119, for power a from 2 to 16
         outer_define1,outer_define2 = abIndexing(abindex)
-    
+
         print("a,b:",outer_define1,outer_define2)
-    
+
         savnam="pypotHCM1%d_%d.midpot"%(int(outer_define1),int(outer_define2))
         HCMethod1(outer_define1,outer_define2,grname,lowname,savnam)
 if sys.argv[1] == "MCM1":

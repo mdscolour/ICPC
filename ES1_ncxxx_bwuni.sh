@@ -2,14 +2,14 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --partition=single
-#SBATCH --error=xxx_EEE_ttt_prompiacc.errout
-#SBATCH --output=xxx_EEE_ttt_prompiacc.resout
-#SBATCH --time=24:00:00
+#SBATCH --error=xxx_ES1_prompiacc.errout
+#SBATCH --output=xxx_ES1_prompiacc.resout
+#SBATCH --time=10:00:00
 #SBATCH --mem=400mb
 
 echo "START_TIME           = `date +'%y-%m-%d %H:%M:%S %s'`"
-##ichr=5
-tdr=HCM1chr2-xxx_program1  # at least one xxx remain
+ichr=42
+tdr=ES1chr2-${ichr}_program1_xxx  # at least one xxx remain
 underWS=/home/hd/hd_hd/hd_gn420/li/v7HCM1
 # need to time walltime
 
@@ -20,7 +20,7 @@ cptarget4=${underWS}/*gr
 cptarget5=${underWS}/*.py
 #cptarget6=${underWS}/chr2-xxx/pot.can
 
-cpback1=${underWS}/chr2-xxx
+cpback1=${underWS}/chr2-${ichr}
 #tdr=xxx_yyy_prolong
 
 # in case intermediate interruption
@@ -47,10 +47,10 @@ cp ${cptarget4} .
 cp ${cptarget5} .
 #cp ${cptarget6} .
 
-g++ -fPIC -shared -o cdll.so cdll.cpp
-python runMolecularMC.py HCM1 xxx
-#g++ runES1.cpp
-#./a.out ${ichr} xxx
+#g++ -fPIC -shared -o cdll.so cdll.cpp
+#python runMolecularMC.py HCM1 xxx
+g++ runES1.cpp
+./a.out ${ichr} xxx
 
 ##### data transfer back
 #cp *.like_bed $cpback1
