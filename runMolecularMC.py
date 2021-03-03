@@ -323,12 +323,9 @@ class classReverseMC:    oldpara = []
         while(SAcount<SAcount_max):
             i = 0
             while(i<1):
-                a = datetime.datetime.now()
                 lib.c_assignAndRun(*self.oldpara)
                 self.energy = self.getCurEnergy()
-                b = datetime.datetime.now()
-                print("aaa",(b-a))
-                exit()
+
                 self.updateNew()
                 lib.c_assignAndRun(*self.newpara)
                 new_E = self.getCurEnergy()
@@ -477,6 +474,25 @@ def SAMethod1(a,b,tagnam,cogname,savenam):
             ann.readyToRun(tagnam,cogname,told,tsiz)
             ann.digitFlag = True
             tmpPara = ann.anneal(100,0.001,0.993,1500,savenam)
+            
+def SAMethod2(tagnam,cogname,savenam):
+    print(tagnam,"simulated annealing started:\n")#,pd.read_csv(cogname,index_col=None))
+    #a,b = 12,6
+    #for a in range(2,19):
+    #    for b in range(1,a):
+    if True:
+        if True:
+            ann = classAnneal()
+            told = []
+            told.append(np.random.randint(130,230))
+            told.append(np.random.randint(1,20))
+            told.append(np.random.randint(1,20))
+            told.append(np.random.randint(1,20))
+            tsiz = [30,3,3,3]
+            ann.readyToRun(tagnam,cogname,told,tsiz)
+            ann.digitFlag = True
+            tmpPara = ann.anneal(100,0.001,0.9989,10000,savenam)
+            
 def HCMethod1(a,b,tagnam,cogname,savenam):
     print(tagnam,"hill climbing started:\n")#,pd.read_csv(cogname,index_col=None))
     #a,b = 12,6
@@ -501,7 +517,67 @@ def MCMethod1(a,b,tagnam,cogname,savenam):
             tsiz = [10,6,0,0]
             crmc.readyToRun(tagnam,cogname,told,tsiz)
             tmpPara = crmc.reverseMC(1,1500,savenam)
+def MCMethod2(tagnam,cogname,savenam):
+    print(tagnam,"reverse Monte Carlo started:\n")#,pd.read_csv(cogname,index_col=None))
+    #a,b = 12,6
+    #for a in range(2,19):
+    #    for b in range(1,a):
+    if True:
+        if True:
+            crmc = classReverseMC()
+            told = []
+            told.append(np.random.randint(130,230))
+            told.append(np.random.randint(1,20))
+            told.append(np.random.randint(1,20))
+            told.append(np.random.randint(1,20))
+            tsiz = [30,3,3,3]
+            crmc.readyToRun(tagnam,cogname,told,tsiz)
+            tmpPara = crmc.reverseMC(1,10000,savenam)
+            
+def mulCanParaFunc(grname,cogname,potname,savname):
+    x,y = np.genfromtxt(grname).T
+    y2 = smooth(y,100)
 
+    lib.c_loadTarget(str.encode(grname))
+    lib.c_readConfig(str.encode(cogname))
+    lib.c_readyToRun()
+
+    data = np.genfromtxt(potname).astype(float)
+    print(data[np.argmin(data[:10,-1]),:])
+    res = []
+    for iToCal in range(len(data)):
+        idata = data[iToCal,:]
+    
+        tmp = lib.c_assignAndRun(*idata[1:5])
+        #energy = lib.c_assignAndRun(163.0,2.0,15.,5.)
+        ycal = []
+        for i in range(len(x)):
+            ycal.append(lib.c_getBestGr(i))
+            #ycal = ycal[:ind]
+    
+        ycal2 = smooth(ycal,100)
+        energy = np.mean((y2-ycal2)**2)
+        res.append([*idata[:-1],energy])
+        #print(iToCal,res[-1],"done")
+    resarr=np.asarray(res)
+    res.append([0]*6)
+    res.append(res[np.argmin(resarr[:,-1])])
+    np.savetxt(savname,res,fmt='%f')
+    print(res[-1])
+    print(len(res),grname[:-6],"done!")
+    return res,ycal2
+if sys.argv[1] == "finCanAll":
+    for itarea in range(8,44):
+        itarea = str(itarea)
+        grname="chr2-%s.midgr"%itarea
+        #lowname="chr2-%s.lowconfig"%itarea
+        #midname="chr2-%s.midconfig"%itarea
+        highname="chr2-%s.highconfig"%itarea
+        
+        potname="chr2-%s/fin.can"%itarea
+        savname='res/chr2-%s.finres'%(itarea)
+        
+        mulCanParaFunc(grname,highname,potname,savname)
 def highCanParaFunc(itarea,iToCal):
     itarea = str(itarea)
     iToCal = int(iToCal)
@@ -510,6 +586,7 @@ def highCanParaFunc(itarea,iToCal):
     #lowname="chr2-%s.lowconfig"%itarea
     midname="chr2-%s.midconfig"%itarea
     #highname="chr2-%s.highconfig"%itarea
+    
     print(grname)
 
     x,y = np.genfromtxt(grname).T
@@ -581,15 +658,15 @@ if sys.argv[1] == "highCanPara":
     print(grname[:-6],"done!")
 
 if sys.argv[1] == "highCanAll":
-    res = []
-    for i in range(2,3):
-        for j in range(0,1):
+    for i in range(34,35):
+        res = []
+        for j in range(0,200):
             rest,grt = highCanParaFunc(i,j)
             res.append(rest)
         resarr=np.asarray(res)
         res.append([0]*6)
         res.append(res[np.argmin(resarr[:,-1])])
-        np.savetxt('res/chr2-%d.201res'%(i),res,fmt='%f')  
+        np.savetxt('chr2-%d/chr2-%d.201res'%(i,i),res,fmt='%f')  
 
 def calCan(itarea):
     ###seed
@@ -670,12 +747,38 @@ if sys.argv[1] == "SAM1":
 
     print("a,b:",outer_define1,outer_define2)
 
-    grname="chr2-%s.LJgr"%itarea###midgr or LJgr or ...
+    grname="chr2-%s.midgr"%itarea###midgr or LJgr or ...
     lowname="chr2-%s.lowconfig"%itarea
     midname="chr2-%s.midconfig"%itarea
     highname="chr2-%s.highconfig"%itarea
     savnam="res/pypotSAM1%d_%d.midpot"%(int(outer_define1),int(outer_define2))
     SAMethod1(outer_define1,outer_define2,grname,lowname,savnam)
+if sys.argv[1] == "SAM2":
+    lib.c_SeedByTime()
+    #if sys.argv[1] == "dPair":
+    #itarea="0"
+    itarea = str(sys.argv[2])
+    idindex = int(sys.argv[3])
+
+    grname="chr2-%s.midgr"%itarea###midgr or LJgr or ...
+    lowname="chr2-%s.lowconfig"%itarea
+    midname="chr2-%s.midconfig"%itarea
+    highname="chr2-%s.highconfig"%itarea
+    savnam="pypotSAM2%d.midpot"%(idindex)
+    SAMethod2(grname,lowname,savnam)    
+if sys.argv[1] == "MCM2":
+    lib.c_SeedByTime()
+    #if sys.argv[1] == "dPair":
+    #itarea="0"
+    itarea = str(sys.argv[2])
+    idindex = int(sys.argv[3])
+
+    grname="chr2-%s.midgr"%itarea###midgr or LJgr or ...
+    lowname="chr2-%s.lowconfig"%itarea
+    midname="chr2-%s.midconfig"%itarea
+    highname="chr2-%s.highconfig"%itarea
+    savnam="pypotMCM2%d.midpot"%(idindex)
+    MCMethod2(grname,lowname,savnam)     
 if sys.argv[1] == "HCM1":
     lib.c_SeedByTime()
     #if sys.argv[1] == "dPair":
@@ -706,7 +809,7 @@ if sys.argv[1] == "MCM1":
 
     print("a,b:",outer_define1,outer_define2)
 
-    grname="chr2-%s.LJgr"%itarea###midgr or LJgr or ...
+    grname="chr2-%s.midgr"%itarea###midgr or LJgr or ...
     lowname="chr2-%s.lowconfig"%itarea
     midname="chr2-%s.midconfig"%itarea
     highname="chr2-%s.highconfig"%itarea
