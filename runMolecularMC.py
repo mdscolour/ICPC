@@ -25,6 +25,8 @@ lib.c_getBestGr.argtypes = [c_int]
 lib.c_getBestGr.restype = c_double
 lib.c_assignAndRun.argtypes = [c_double,c_double,c_double,c_double]
 lib.c_assignAndRun.restype = c_double
+lib.c_setNumConfigs.argtypes = [c_int]
+lib.c_getNumConfigs.restype = c_int
 
 #if False:
 #    lib.c_SeedByTime()

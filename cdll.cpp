@@ -28,6 +28,8 @@ extern "C" {
     double c_assignAndRun(double p1,double p2,double p3,double p4)
     {return coreDirectRun::assignAndRun(p1,p2,p3,p4);}
     double c_getBestGr(int pos){return coreDirectRun::savegr[pos];}
+    void c_setNumConfigs(int numconfig){coreDirectRun::global_num_configs=numconfig;}
+    int c_getNumConfigs(){return coreDirectRun::global_num_configs;}
 }
 
 
