@@ -603,7 +603,42 @@ public:
         VectorDividedByScalar(gr, countgr);
         return gr;
     }
-   
+    
+    static bool assignAndWriteV9(double p1,double p2,double p3,double p4,int ngrpoint,double dxt,const char *namefingr = "fingr.gr",const char *nameconfig = "config.config")
+    {
+        readConfig(nameconfig);
+        //readyToRun();
+        assignPara(p1,p2,p3,p4);
+        newMMC();
+        
+        bool illedFlag = MMC->illedPot();
+        if (illedFlag)
+        {   
+            write2DVector(namefingr,arange(0,ngrpoint*dxt,dxt),
+                          linspace(0,0,ngrpoint));
+            cout<<"test"<<endl;
+            return false;
+        }
+
+        
+        MMC->run(global_init_step);
+        vector<double> gr = MMC->getGr(ngrpoint, dxt);
+        //printfVector(gr);
+        vector<double> tgr;
+        double countgr = 1;
+        for (int i = 0; i < global_num_configs; i++)
+        {
+            MMC->run(global_num_steps);
+            tgr = MMC->getGr(ngrpoint, dxt);
+            VectorAddedByVector(gr, tgr);
+            countgr++;
+        }
+        VectorDividedByScalar(gr, countgr);
+        write2DVector(namefingr,arange(0,ngrpoint*dxt,dxt),gr);
+        deleteMMC();
+        return true;
+    }
+    
     static void readyToRun()
     {
         newMMC();
