@@ -1,16 +1,14 @@
-#!/bin/bash
-#SBATCH --nodes=1
-#SBATCH --ntasks-per-node=1
-#SBATCH --partition=single
-#SBATCH --error=xxx_EEE_ttt_prompiacc.errout
-#SBATCH --output=xxx_EEE_ttt_prompiacc.resout
-#SBATCH --time=24:00:00
-#SBATCH --mem=400mb
+#PBS -l nodes=1:ppn=1:medium_buster
+#PBS -q medium_buster
+#PBS -e ncxxx.errout
+#PBS -o ncxxx.resout
+#PBS -l walltime=36:00:00
+#PBS -l mem=800mb,vmem=800mb
 
 echo "START_TIME           = `date +'%y-%m-%d %H:%M:%S %s'`"
-##ichr=5
-tdr=HCM1chr2-xxx_program1  # at least one xxx remain
-underWS=/home/hd/hd_hd/hd_gn420/li/v7HCM1
+###ichr=0
+tdr=v10chr2-xxx_program1  # at least one xxx remain
+underWS=/remote/pi310b/li/MolecularMC/v10
 # need to time walltime
 
 cptarget1=${underWS}/*.cpp
@@ -18,9 +16,9 @@ cptarget2=${underWS}/*.h
 cptarget3=${underWS}/*config
 cptarget4=${underWS}/*gr
 cptarget5=${underWS}/*.py
-#cptarget6=${underWS}/chr2-xxx/pot.can
+#cptarget6=${underWS}/chr4-${ichr}/pot.can
 
-cpback1=${underWS}/chr2-xxx
+cpback1=${underWS}/res
 #tdr=xxx_yyy_prolong
 
 # in case intermediate interruption
@@ -48,7 +46,8 @@ cp ${cptarget5} .
 #cp ${cptarget6} .
 
 g++ -fPIC -shared -o cdll.so cdll.cpp
-python runMolecularMC.py HCM1 xxx
+#./runNoOpt.py xxx yyy
+./runV10.py xxx
 #g++ runES1.cpp
 #./a.out ${ichr} xxx
 
@@ -56,7 +55,7 @@ python runMolecularMC.py HCM1 xxx
 #cp *.like_bed $cpback1
 #cp *_ctcfbin $cpback1
 #cp *_ctcfbin47* $cpback1
-cp *pot $cpback1
+#cp *pot $cpback1
 #cp *201res $cpback1
 #cp *201gr $cpback1
 #cp _chrxxx.like_wig $cpback1

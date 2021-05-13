@@ -45,13 +45,17 @@ sprintf(conforname, "res/chr2-%s.pml", itarea);
 sprintf(finresname, "res/chr2-%s.finres", itarea);
 sprintf(savegrname, "res/chr2-%s.gr", itarea);
 
-double t1,t2;
-FILE *fptrpara = fopen(finresname, "r");
-while (fscanf(fptrpara, "%lf %lf %lf %lf %lf %lf\n", &t1, &global_sigma,
-    &global_epsilon, &global_a, &global_b, &t2) == 6){}
-fclose(fptrpara);
-printf("%lf %lf %lf %lf %lf %lf\n", t1, global_sigma,
-    global_epsilon, global_a, global_b, t2);
+// double t1,t2;
+// FILE *fptrpara = fopen(finresname, "r");
+// while (fscanf(fptrpara, "%lf %lf %lf %lf %lf %lf\n", &t1, &global_sigma,
+//     &global_epsilon, &global_a, &global_b, &t2) == 6){}
+// fclose(fptrpara);
+global_sigma=164;
+global_epsilon=1;
+global_a=14;
+global_b=13;
+//printf("%lf %lf %lf %lf %lf %lf\n", t1, global_sigma,
+//    global_epsilon, global_a, global_b, t2);
 
 coreDirectRun::loadTarget(grname);
 coreDirectRun::readConfig(lowname);
@@ -79,7 +83,7 @@ int lgr = int(double(ngr) * dx);
     //const char* saveGrName="res/chr2-0.gr";
     //double spacing;
     
-    int num_configs=15000;//coreDirectRun::global_num_configs;
+    int num_configs=5000;//coreDirectRun::global_num_configs;
     int num_steps=10;//coreDirectRun::global_num_steps;
     int init_step=5000;//coreDirectRun::global_init_step;
     MMC.run(init_step);
@@ -124,22 +128,17 @@ int lgr = int(double(ngr) * dx);
 //    int lgr = 160;
 //    int ngr = 320;
 //    double dx=0.5;
-    //vector<double> gr=MMC.getGr(ngr,dx);
+    vector<double> gr=MMC.getGr(ngr,dx);
     //printfVector(gr);
     
-    FILE *fptr;int st,ed;double pc;
-    fptr = fopen(conforname, "w");
+    //FILE *fptr;int st,ed;double pc;
+    //fptr = fopen(conforname, "w");
     for(int i=0;i<num_configs;i++)
     {
         MMC.run(num_steps);
         nsteps+=num_steps;
-        //VectorAddedByVector(gr,MMC.getGr(ngr,dx));
+        VectorAddedByVector(gr,MMC.getGr(ngr,dx));
                 
-        //spacing = MMC.part[num-1]-MMC.part[0];
-        //if(spacing!=spaold)printf("%d   %.8f    %.8f \n",i,MMC.part[num-1],MMC.part[0]);
-        //spaold=spacing;
-        //fprintf(fptrinit, "%d %.5f\n",i,spacing/num);
-        //rintf("initializaiton %d steps....done, %.6f spacing\n",nsteps,spacing/num);
         if(i%1000==0)
         printf("configuration %d in %d....done.\n",i,num_configs);
         
@@ -168,24 +167,24 @@ int lgr = int(double(ngr) * dx);
         //cmd.load_cgo( [ 9.0, x1, y1, z1, x2, y2, z2, radius, r1, g1, b1, r2, g2, b2 ], "cylinder1" )
         //char spnamebuffer[50];
         //sprintf(spnamebuffer, "%d", 9999);
-        vector<double> v = MMC.part;
-        sort(v.begin(),v.end());
-        fprintf(fptr, "cmd.load_cgo( [ 9.0, 0, 0, 0, %f, 0, 0, 5, 55, 0, 0, 55, 0, 0], \"line%d\" )\n", v[0]-50.,9999);
-        
-        for(int i=0;i<10;i++){
-        fprintf(fptr, "cmd.load_cgo( [ 9.0, %f, 25, 0, %f, -25, 0, 200, 14,73,92, 56,86,96], \"cylinder%d\" )\n", v[i]-50.,v[i]+50.,i);
-
-        fprintf(fptr, "cmd.load_cgo( [ 9.0, %f, 0, 0, %f, 0, 0, 10, 55, 0, 0, 55, 0, 0], \"line%d\" )\n", v[i]+50.,v[i+1]-50.,i);}
-        
-        fprintf(fptr,"cmd.bg_color(\"white\")\n");
-        fclose(fptr);
-        exit(0);
+//         vector<double> v = MMC.part;
+//         sort(v.begin(),v.end());
+//         fprintf(fptr, "cmd.load_cgo( [ 9.0, 0, 0, 0, %f, 0, 0, 5, 55, 0, 0, 55, 0, 0], \"line%d\" )\n", v[0]-50.,9999);
+//         
+//         for(int i=0;i<10;i++){
+//         fprintf(fptr, "cmd.load_cgo( [ 9.0, %f, 25, 0, %f, -25, 0, 200, 14,73,92, 56,86,96], \"cylinder%d\" )\n", v[i]-50.,v[i]+50.,i);
+// 
+//         fprintf(fptr, "cmd.load_cgo( [ 9.0, %f, 0, 0, %f, 0, 0, 10, 55, 0, 0, 55, 0, 0], \"line%d\" )\n", v[i]+50.,v[i+1]-50.,i);}
+//         
+//         fprintf(fptr,"cmd.bg_color(\"white\")\n");
+//         fclose(fptr);
+//         exit(0);
     }
-    fclose(fptr);
+    //fclose(fptr);
     
     //fclose(fptrinit);
-    //VectorDividedByScalar(gr,num_configs);
-    //write2DVector(savegrname,arange(0,lgr,dx),gr);
+    VectorDividedByScalar(gr,num_configs);
+    write2DVector(savegrname,arange(0,lgr,dx),gr);
 
     return 0; 
 } 

@@ -1,8 +1,6 @@
 #! /remote/gpu05/anaconda3/bin/python3
 # -*- coding: utf-8 -*-
 
-from noisyopt import minimizeCompass
-
 import os
 import sys
 import copy
@@ -16,10 +14,6 @@ import numpy as np
 #import pandas as pd
 
 snsec = sys.argv[1]
-snx0 = [sys.argv[2],sys.argv[3],sys.argv[4],sys.argv[5]]
-snx0 = np.asarray(snx0).astype(float)
-
-
 
 def smooth(y, box_pts):
     box = np.ones(box_pts)/box_pts
@@ -42,7 +36,7 @@ lib.c_getNumConfigs.restype = c_int
 
 ### prepare globals
 tag = "chr2-%s.midgr"%snsec      
-cog = "chr2-%s.lowconfig"%snsec  
+cog = "chr2-%s.lowconfig"%snsec    
 smrat = 100
 targetX,targetY = np.genfromtxt(tag).T
 targetY = smooth(targetY,smrat)
@@ -70,26 +64,56 @@ def getCurEnergy():
 
 ### noisyopt start    
 objcount=0
-def obj(x):
+def paraToMoment(x):
     global objcount
     objcount+=1
-    if objcount%1000==0:
+    if objcount%100==0:
         print(objcount)
     a = x[0]
     b = x[1]
     c = x[2]
     d = x[3]
     lib.c_assignAndRun(a,b,c,d)
+    return getCurMoment()
+def obj(x):
+    #global objcount
+    #objcount+=1
+    #if objcount%100==0:
+    #    print(objcount)
+    a = x[0]
+    b = x[1]
+    c = x[2]
+    d = x[3]
+    lib.c_assignAndRun(a,b,c,d)
     return getCurEnergy()
-    #return getCurMoment()
+    
+candidates = []
+for c in np.arange(2,21,1):
+    for d in np.arange(1,c,1):
+        for a in np.arange(140,171,1):
+            for b in np.arange(1,15,1):
+                candidates.append([a,b,c,d])
+candidates = np.asarray(candidates)
 
-#start_time = time.time()
-#print(obj([12,6]))
-#print("--- %s seconds ---" % (time.time() - start_time))
-
-lib.c_setNumConfigs(100)
-
-res = minimizeCompass(obj, x0=snx0, deltatol=1, paired=False)
-print(objcount)
-print(snx0)
-print(res)
+for pnumcon in [100,200,500,1000,5000,10000,20000,50000,100000]:
+    canN = len(candidates)
+    print("iteration:%i,N:%i"%(pnumcon,canN))
+    lib.c_setNumConfigs(pnumcon)
+    
+    canM1 = np.zeros(canN)
+    for ican in range(canN):
+        canM1[ican]= obj(candidates[ican])
+    
+    canN2 = int(0.3*canN)
+    if canN2 == 0:
+        canN2 = 1
+    argcan2 = canM1.argsort()[:canN2]
+    candidates = candidates[argcan2]
+#print(argcan2)
+canM1 = canM1[argcan2]
+print(canM1)
+print(candidates)
+    
+    
+    
+    
