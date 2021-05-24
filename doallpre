@@ -1,9 +1,0 @@
-for ncps in {0..43..1}
-do
-    echo $ncps
-    #mkdir chr2-${ncps}
-    #cp ../v7/chr2-${ncps}/pot.can chr2-${ncps}/
-    ./a.out $ncps
-done
-
-

@@ -35,8 +35,9 @@ lib.c_setNumConfigs.argtypes = [c_int]
 lib.c_getNumConfigs.restype = c_int
 
 ### prepare globals
-tag = "chr2-%s.midgr"%snsec      
-cog = "chr2-%s.lowconfig"%snsec    
+tag = "%s.midgr"%snsec      
+cog = "%s.lowconfig"%snsec 
+resfile = "%s.finres"%snsec   
 smrat = 100
 targetX,targetY = np.genfromtxt(tag).T
 targetY = smooth(targetY,smrat)
@@ -63,18 +64,18 @@ def getCurEnergy():
     return np.mean((targetY-ycal2)**2)
 
 ### noisyopt start    
-objcount=0
-def paraToMoment(x):
-    global objcount
-    objcount+=1
-    if objcount%100==0:
-        print(objcount)
-    a = x[0]
-    b = x[1]
-    c = x[2]
-    d = x[3]
-    lib.c_assignAndRun(a,b,c,d)
-    return getCurMoment()
+#objcount=0
+#def paraToMoment(x):
+#    global objcount
+#    objcount+=1
+#    if objcount%100==0:
+#        print(objcount)
+#    a = x[0]
+#    b = x[1]
+#    c = x[2]
+#    d = x[3]
+#    lib.c_assignAndRun(a,b,c,d)
+#    return getCurMoment()
 def obj(x):
     #global objcount
     #objcount+=1
@@ -109,10 +110,12 @@ for pnumcon in [100,200,500,1000,5000,10000,20000,50000,100000]:
         canN2 = 1
     argcan2 = canM1.argsort()[:canN2]
     candidates = candidates[argcan2]
-#print(argcan2)
+print(argcan2)
 canM1 = canM1[argcan2]
 print(canM1)
 print(candidates)
+np.savetxt(resfile,candidates[0].reshape(1,4))
+
     
     
     

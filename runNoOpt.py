@@ -16,10 +16,14 @@ import numpy as np
 #import pandas as pd
 
 snsec = sys.argv[1]
-snx0 = [sys.argv[2],sys.argv[3],sys.argv[4],sys.argv[5]]
-snx0 = np.asarray(snx0).astype(float)
-
-
+tag = "%s.midgr"%snsec      
+cog = "%s.lowconfig"%snsec  
+resfile = "%s.finres"%snsec 
+if len(sys.argv)>2:
+    snx0 = [sys.argv[2],sys.argv[3],sys.argv[4],sys.argv[5]]
+    snx0 = np.asarray(snx0).astype(float)
+else:
+    snx0 = np.genfromtxt(resfile)
 
 def smooth(y, box_pts):
     box = np.ones(box_pts)/box_pts
@@ -41,8 +45,6 @@ lib.c_setNumConfigs.argtypes = [c_int]
 lib.c_getNumConfigs.restype = c_int
 
 ### prepare globals
-tag = "chr2-%s.midgr"%snsec      
-cog = "chr2-%s.lowconfig"%snsec  
 smrat = 100
 targetX,targetY = np.genfromtxt(tag).T
 targetY = smooth(targetY,smrat)
@@ -73,8 +75,8 @@ objcount=0
 def obj(x):
     global objcount
     objcount+=1
-    if objcount%1000==0:
-        print(objcount)
+    #if objcount%1000==0:
+    #    print(objcount)
     a = x[0]
     b = x[1]
     c = x[2]
@@ -91,5 +93,9 @@ lib.c_setNumConfigs(100)
 
 res = minimizeCompass(obj, x0=snx0, deltatol=1, paired=False)
 print(objcount)
+print(res.success)
 print(snx0)
-print(res)
+print(res.x)
+np.savetxt(resfile, np.vstack((snx0,res.x)))
+
+
