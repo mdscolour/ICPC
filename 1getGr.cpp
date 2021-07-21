@@ -16,14 +16,14 @@ double potential(double r){
     //return FeneBond(r,1,30,3)+QuarticBond(r,1,1,10)+FeneBond(r,-1,30,8);
     return LJPotential(r,3,3);
 }
-void getCanGr(int itarea,int nchr,const char *likebedname,const char *fprefix)
+void getCanGr(int itarea,const char *nchr,const char *likebedname,const char *fprefix)
 {
     double st = itarea*50000;
     double ed = itarea*50000+75000;
     // function of potential, temperature, step size
 	coreMolecularMC MMC=coreMolecularMC(&potential,1,0.45,100);
     char saveGrName[50];
-    sprintf(saveGrName, "%s/chr%d-%d.midgrpre",fprefix,nchr,itarea);
+    sprintf(saveGrName, "%s/chr%s-%d.midgrpre",fprefix,nchr,itarea);
     MMC.setBox(st,ed);
 
     FILE *fptr = fopen(likebedname, "r");
@@ -54,7 +54,7 @@ void getCanGr(int itarea,int nchr,const char *likebedname,const char *fprefix)
     fclose(fptr);
 
     char bufferpre[50];
-    sprintf(bufferpre,"%s/chr%d-%d.preconfig",fprefix,nchr,itarea);
+    sprintf(bufferpre,"%s/chr%s-%d.preconfig",fprefix,nchr,itarea);
     fptr = fopen(bufferpre, "w");
     fprintf(fptr, "global_boxl:%lf\n", 0.);
     fprintf(fptr, "global_boxr:%lf\n", ed-st);
@@ -83,13 +83,12 @@ int main(int argc,char *argv[])
 {    /**************  random seed  *******************************/
 SeedByTime();
 
-int nchr=atoi(argv[1]);
 int maxlen = atoi(argv[2]);
 int maxsection = int(maxlen/50000);
 if(maxsection*50000+25000 > maxlen) maxsection--;
 
 for(int i=0;i<maxsection;i++)
-    getCanGr(i,nchr,argv[3],argv[4]);
+    getCanGr(i,argv[1],argv[3],argv[4]);
 
     return 0; 
 } 
