@@ -9,3 +9,6 @@ chr*
 povray
 sequenceData
 res
+plot*
+*.pdf
+*.so

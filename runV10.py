@@ -96,6 +96,7 @@ for c in np.arange(2,21,1):
                 candidates.append([a,b,c,d])
 candidates = np.asarray(candidates)
 
+#this part is suitable for parallel computing
 for pnumcon in [100,200,500,1000,5000,10000,20000,50000,100000]:
     canN = len(candidates)
     print("iteration:%i,N:%i"%(pnumcon,canN))

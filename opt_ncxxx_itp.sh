@@ -2,9 +2,10 @@
 #PBS -q medium_buster
 #PBS -e ncxxx.errout
 #PBS -o ncxxx.resout
-#PBS -l walltime=55:00:00
+#PBS -l walltime=72:00:00
 #PBS -l mem=800mb,vmem=800mb
 
+### previously 55 hours
 echo "START_TIME           = `date +'%y-%m-%d %H:%M:%S %s'`"
 ###ichr=0
 tdr=v10xxx_program1  # at least one x remain
