@@ -16,10 +16,10 @@ double potential(double r){
     //return FeneBond(r,1,30,3)+QuarticBond(r,1,1,10)+FeneBond(r,-1,30,8);
     return LJPotential(r,3,3);
 }
-void getCanGr(int itarea,const char *nchr,const char *likebedname,const char *fprefix)
+void getCanGr(int itarea,const char *nchr,const char *likebedname,const char *fprefix,int seclen,int inclen,int lgr=1000,double dx=5)
 {
-    double st = itarea*50000;
-    double ed = itarea*50000+75000;
+    double st = itarea*seclen;
+    double ed = itarea*seclen+seclen+inclen;
     // function of potential, temperature, step size
 	coreMolecularMC MMC=coreMolecularMC(&potential,1,0.45,100);
     char saveGrName[50];
@@ -70,8 +70,8 @@ void getCanGr(int itarea,const char *nchr,const char *likebedname,const char *fp
 //     printfVector(MMC.part);
 //     MMC.readyEverything();
     
-    int lgr = 1000;
-    double dx=5;
+    //int lgr = 1000;///set as parameter
+    //double dx=5;///set as parameter
     int ngr = int(double(lgr)/dx);
     vector<double> gr=MMC.getGr(ngr,dx);
 
@@ -83,12 +83,15 @@ int main(int argc,char *argv[])
 {    /**************  random seed  *******************************/
 SeedByTime();
 
-int maxlen = atoi(argv[2]);
-int maxsection = int(maxlen/50000);
-if(maxsection*50000+25000 > maxlen) maxsection--;
+//int maxlen = atoi(argv[2]);
+//int maxsection = int(maxlen/50000);
+//if(maxsection*50000+25000 > maxlen) maxsection--;
+int maxsection = atoi(argv[2]);
+int argseclen = atoi(argv[5]);
+int arginclen = atoi(argv[6]);
 
 for(int i=0;i<maxsection;i++)
-    getCanGr(i,argv[1],argv[3],argv[4]);
+    getCanGr(i,argv[1],argv[3],argv[4],argseclen,arginclen);
 
     return 0; 
 } 

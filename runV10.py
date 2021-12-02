@@ -37,8 +37,31 @@ lib.c_getNumConfigs.restype = c_int
 ### prepare globals
 tag = "%s.midgr"%snsec      
 cog = "%s.lowconfig"%snsec 
-resfile = "%s.finres"%snsec   
-smrat = 100
+
+### generating all candidates
+### accuracy can be changed here!
+resfile = "%s.finres01"%snsec #final potential file name
+
+#candidates = []
+#for c in np.arange(2,21,1):
+#    for d in np.arange(1,c,1):
+#        for a in np.arange(140,171,1):
+#            for b in np.arange(1,15,1):
+#                candidates.append([a,b,c,d])
+#candidates = np.asarray(candidates)
+
+oldresfile = "%s.finres02"%snsec
+oldres = np.ravel(np.genfromtxt(oldresfile))[:4]
+candidates = []
+for c in np.arange(max(2,oldres[2]-2),oldres[2]+2,0.1):
+    for d in np.arange(max(1,c-3),c,0.1):
+        for a in [oldres[0]]:
+            for b in np.arange(1,17,0.1):
+                candidates.append([a,b,c,d])
+candidates = np.asarray(candidates)
+
+
+smrat = 100 ## a smoothing of 100 points, that is 1 in Gr curve
 targetX,targetY = np.genfromtxt(tag).T
 targetY = smooth(targetY,smrat)
 targetN = len(targetX)
@@ -88,16 +111,11 @@ def obj(x):
     lib.c_assignAndRun(a,b,c,d)
     return getCurEnergy()
     
-candidates = []
-for c in np.arange(2,21,1):
-    for d in np.arange(1,c,1):
-        for a in np.arange(140,171,1):
-            for b in np.arange(1,15,1):
-                candidates.append([a,b,c,d])
-candidates = np.asarray(candidates)
-
-#this part is suitable for parallel computing
-for pnumcon in [100,200,500,1000,5000,10000,20000,50000,100000]:
+### calculate for all candidates in list "candidates"
+### this part is suitable for parallel computing
+### parallel computing needed to be adjusted individually
+for pnumcon in [50,100,200,500,1000,5000,10000,20000,50000,100000]:
+#for pnumcon in [20000,50000,100000]:
     canN = len(candidates)
     print("iteration:%i,N:%i"%(pnumcon,canN))
     lib.c_setNumConfigs(pnumcon)
@@ -106,15 +124,20 @@ for pnumcon in [100,200,500,1000,5000,10000,20000,50000,100000]:
     for ican in range(canN):
         canM1[ican]= obj(candidates[ican])
     
-    canN2 = int(0.3*canN)
+    canN2 = int(0.25*canN)  ### selection ratio is 0.25
     if canN2 == 0:
         canN2 = 1
     argcan2 = canM1.argsort()[:canN2]
     candidates = candidates[argcan2]
+    ### out of loop when only one remains
+    if canN2 == 1: 
+        break
+
 print(argcan2)
 canM1 = canM1[argcan2]
 print(canM1)
 print(candidates)
+### if already outside the loop and multiple ramain, choose the best one
 np.savetxt(resfile,candidates[0].reshape(1,4))
 
     

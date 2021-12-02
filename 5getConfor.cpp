@@ -37,7 +37,7 @@ char finresname[50];
 sprintf(grname, "chr%s-%s.midgr", argv[2],argv[1]);
 sprintf(lowname, "chr%s-%s.lowconfig",argv[2],argv[1]);
 sprintf(conforname, "chr%s-%s.confor",argv[2],argv[1]);
-sprintf(finresname, "chr%s-%s.finres",argv[2],argv[1]);
+sprintf(finresname, "chr%s-%s.finrestmp",argv[2],argv[1]);
 
 FILE *fptrpara = fopen(finresname, "r");
 while(fscanf(fptrpara, "%lf %lf %lf %lf\n", 
