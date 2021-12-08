@@ -17,8 +17,7 @@ import matplotlib as mpl
 #####
 """
 this is file to control and run all the function
-
-change area length need to change this file (, calCompress)
+See "__main__" part
 """
 
 #######preparation of .like_bed file, .bed file is needed
@@ -212,7 +211,7 @@ def calCompress(ichr,ita,boxrngT):
     sol = np.linalg.lstsq(A, y,rcond=None)
     v, c = sol[0]
     #print(i,v,c)
-    return [i,v,c]+rhoktKTarr
+    return [ita,v,c]+rhoktKTarr
 def calCompressibility(nameout="compress.out"):
     boxrng = np.arange(1,41,1)
     
@@ -790,9 +789,8 @@ if __name__ == '__main__':
     
     ### submit tasks for all sections to ITP cluster
     ### for calculate the optimized potential
-    ### change accuracy need to change here and file "runV10.py"
-    #namesubfix="finres01"
-    
+    ### change accuracy need to change here (namesubfix) and file "runV10.py"
+    #namesubfix="finres01" 
     #submitAllMissing(namesubfix)
     
     ### or submit quest for one chromosome
@@ -805,8 +803,9 @@ if __name__ == '__main__':
     ### default box size range for compressibilities is np.arange(1,41,1), 
     ### it can be changed in function calCompressibility()
     ### default box size cutoff is 15 in function calCompressibility()
+    namesubfix="finres01" 
     #calConformation(namesubfix)
-    #calCompressibility("compress%s.out"%(namesubfix[-2:]))
-    #os.system("rm */*.confor")
+    calCompressibility("compress%s.out"%(namesubfix[-2:]))
+    os.system("rm */*.confor")
     
           
