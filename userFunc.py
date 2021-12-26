@@ -7,19 +7,14 @@ import copy
 import time
 import numpy as np
 from scipy.interpolate import interp1d
-from matplotlib import pyplot as plt
-from matplotlib.collections import BrokenBarHCollection
-import scipy.cluster.hierarchy as shc
-from sklearn.cluster import AgglomerativeClustering
-import matplotlib as mpl 
 
 ### preparation of .like_bed file, .bed file is needed
 def quickBedSep():
-    os.system("./0bedSep.py") 
+    os.system("./bedSep.py") 
     
-def getGrAndConfig(target_file_pathT,seclen=50000,inclen=25000):
-    global chrRng
-    global chrLength
+def getGrAndConfig(chrRng,chrLength,target_file_pathT,seclen=50000,inclen=25000):
+    #global chrRng
+    #global chrLength
     for iChromosome in range(len(chrRng)):  
         Chromosome = chrRng[iChromosome] 
         ### set maximum length
@@ -30,18 +25,17 @@ def getGrAndConfig(target_file_pathT,seclen=50000,inclen=25000):
             maxsection-=1;
        
        
-        ### preparation of .lowconfig and .midgr file
-
-        #if True:        
+        ### preparation of .lowconfig and .midgr file        
         ### create .midgrpre and .preconfig. Run in the main folder.
         target_file = "%s/_chr%s.like_bed"%(target_file_pathT,Chromosome)
         ### compile
         os.system("g++ -o 1getGr.out 1getGr.cpp")
         ### create folders if not exist
-        try:
+        if not os.path.exists("chr%s"%Chromosome):
             os.system("mkdir chr%s"%Chromosome)
-        except:
-            pass
+        else:
+            print("Folder chr%s exists, write in that folder."%Chromosome)
+            
         ### run with 6 paramters
         ### the default Gr is calculated to 1000 with stepsize 5
         ### i.e. in range(0,1000,5). Stepsize 5 is according to data quality.
@@ -50,7 +44,6 @@ def getGrAndConfig(target_file_pathT,seclen=50000,inclen=25000):
         os.system("./1getGr.out %s %d %s chr%s %d %d"%
         (Chromosome,maxsection,target_file,Chromosome,seclen,inclen))
         
-        #if False:
         ### from .preconfig to .lowconfig. Run in the subfolder.
         os.system("g++ -o 2getConfig.out 2getConfig.cpp")
         os.chdir("chr%s"%Chromosome)
@@ -58,7 +51,6 @@ def getGrAndConfig(target_file_pathT,seclen=50000,inclen=25000):
             os.system("../2getConfig.out %d %s"%(ita,Chromosome))
         #os.chdir("..")
         
-        #if False:
         ### here is step 3
         ### from .midgrpre to .midgr. Run in the subfolder.
         #os.chdir("chr%s"%Chromosome)
@@ -77,6 +69,7 @@ def getGrAndConfig(target_file_pathT,seclen=50000,inclen=25000):
         
         os.system("rm *pre*")
         os.chdir("..")
+        print("For chr. %s, creation of RDF & config file success."%Chromosome)
 
 ### submitting tasks to the ITP clusters
 ### to run and get the potential, the .finres file.
@@ -119,11 +112,11 @@ def submitAllMissing(namesubfix="finres"):
 
 ### calculate conformations for all sections
 ### it will temporarily change the result file name
-def calConformation(namesubfix="finres",mcs=100000):
+def calConformation(chrRng,namesubfix="finres",mcs=100000):
     os.system("g++ -o 5getConfor.out 5getConfor.cpp")
     #chrRng = ['R'] 
     #chrRng = ['1','2','3','4','5','6','7','R'] 
-    global chrRng
+    #global chrRng
     
     for ichr in chrRng:
         os.chdir("chr%s"%ichr)
@@ -196,11 +189,11 @@ def calCompress(ichr,ita,boxrngT):
     v, c = sol[0]
     #print(i,v,c)
     return [ita,v,c]+rhoktKTarr
-def calCompressibility(nameout="compress.out"):
+def calCompressibility(chrRng,nameout="compress.out"):
     #boxrng = np.arange(1,41,1)
     boxrng = np.arange(16,41,2)
     
-    global chrRng
+    #global chrRng
     #chrRng = ['1','2','3','4','5','6','7','R'] 
     #chrRng = ['1'] 
     for ichr in chrRng:
@@ -218,7 +211,7 @@ def calCompressibility(nameout="compress.out"):
         for i in isecrng:
             #print(ichr,i)
             irescomp = calCompress(ichr,i,boxrng)
-            print(ichr,irescomp[:3])
+            #print(ichr,irescomp[:3])
             for itemires in irescomp:
                 ffin.write("%f "%itemires)
             ffin.write("\n")
@@ -226,9 +219,10 @@ def calCompressibility(nameout="compress.out"):
         os.chdir("..")
         
 ### combine the data into one file    
-def summarizeAllValue(namesubfix,namecompress,namerespot="Potential01_100000.like_bed"):  
+def summarizeAllValue(chrRng,namesubfix,namecompress,
+    namerespot="Potential01_100000.like_bed"):  
     res=[]
-    global chrRng
+    #global chrRng
     #chrRng = ['R']#,'7','6','5','4','3','2','1'] 
     #chrRng = ['R','7','6','5','4','3','2','1'][::-1] 
     for ichr in chrRng:
@@ -237,7 +231,8 @@ def summarizeAllValue(namesubfix,namecompress,namerespot="Potential01_100000.lik
                   ) for f in os.listdir() if f.endswith(namesubfix)]
         isecrng.sort()
 
-        tcom = np.genfromtxt(namecompress,skip_header=1)
+        #tcom = np.genfromtxt(namecompress,skip_header=1)
+        tcom = np.loadtxt(namecompress,skiprows=1,ndmin=2)
         
         for ipat in isecrng:
             cLoc = np.where(tcom[:,0]==ipat)
@@ -257,10 +252,25 @@ def summarizeAllValue(namesubfix,namecompress,namerespot="Potential01_100000.lik
         os.chdir("..")
             
     #res = np.asarray(res).astype(float)
-    print("length",len(res))
+    #print("length",len(res))
     #print(res)
-    pd.DataFrame(res).to_csv(namerespot,sep="\t",index=False,header=None)
-    
+    #pd.DataFrame(res).to_csv(namerespot,sep="\t",index=False,header=None)
+    fout = open(namerespot,'w') 
+    fout.write("chromosome start_site end_site section_index "+
+    "sigma epsilon delta nu compressibility\n")
+    fout.write("File storing Effective potential and compressibilities\n")
+    for etRes in res:
+        for etEtRes in etRes:
+            if type(etEtRes) == str:
+                fout.write("%s\t"%(etEtRes)) 
+            elif type(etEtRes) == float or type(etEtRes) == np.float64:
+                fout.write("%f\t"%(etEtRes))
+            elif type(etEtRes) == int:
+                fout.write("%d\t"%(etEtRes))
+            else:
+                print("Value error in:",etRes) 
+        fout.write("\n") 
+    fout.close() 
     
        
 #if __name__ == '__main__':
@@ -272,9 +282,12 @@ def summarizeAllValue(namesubfix,namecompress,namerespot="Potential01_100000.lik
     ### get radial distribution function and config file   
     ### last two parameter decide the section length
     ### change section length need to change here
-    #chrRng = ['1','2','3','4','5','6','7','R']
+    ### target chromosome index
+    #chrRng = ['1','2','3','4','5','6','7','R'] 
+    ### target chromosome length
+    #chrLength = [3188341,2231883,1799298,1603259,1190845,1033292,949511,2286237]
     #target_file_path = "/scratch/li/MolecularMC/candida"
-    #getGrAndConfig(target_file_path,50000,25000)
+    #getGrAndConfig(chrRng,chrLength,target_file_path,50000,25000)
     
     
     
@@ -304,8 +317,8 @@ def summarizeAllValue(namesubfix,namecompress,namerespot="Potential01_100000.lik
     #namesubfix="finres0.1" 
     
     #chrRng = ['R'] 
-    #calConformation(namesubfix)
-    #calCompressibility("compress01_100000.out")
+    #calConformation(chrRng,namesubfix)
+    #calCompressibility(chrRng,"compress01_100000.out")
     #os.system("rm */*.confor")
     
     

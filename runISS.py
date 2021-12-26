@@ -1,20 +1,22 @@
+"""
+This is runISS.py file.
+It it the main file to solve the noisy
+optimization problem.
+"""
+
 import os
 import sys
 import copy
 import time
-#sys.path.append('/home/li/bin/')
 from ctypes import cdll
 from ctypes import *
 import numpy as np
-#from pylab import *
-#from scipy.optimize import curve_fit
-#import pandas as pd
 
 snsec = sys.argv[1]
 keystr = sys.argv[2]
 ressep = sys.argv[3]
 if keystr == "testRun":
-    MCStrategyRng = [2,5,10,50,100,500,1000,5000,10000]
+    MCStrategyRng = [1,2,5,10,50,100,500,1000,50000]
 elif keystr == "normalRun":
     MCStrategyRng = [100,200,500,1000,5000,10000,20000,50000,100000]  
 else:
@@ -27,8 +29,10 @@ def smooth(y, box_pts):
 
 if(not os.path.isfile("./cdll.so")):
     os.system("g++ -fPIC -shared -o cdll.so cdll.cpp")
-
-#### load the library
+    
+# =============================================================================
+# load the library
+# =============================================================================
 lib = cdll.LoadLibrary('./cdll.so')
 lib.c_loadTarget.argtypes = [c_char_p]
 lib.c_readConfig.argtypes = [c_char_p]
@@ -39,14 +43,15 @@ lib.c_assignAndRun.restype = c_double
 lib.c_setNumConfigs.argtypes = [c_int]
 lib.c_getNumConfigs.restype = c_int
 
-### prepare data files
+ prepare data files
 tag = "%s.midgr"%snsec      
 cog = "%s.lowconfig"%snsec 
 
-### generating all candidates
-### accuracy can be changed here!
-#ressep = 1
+# =============================================================================
+# generating all candidates
+# =============================================================================
 
+# accuracy can be changed here by eg. ressep = 1!
 if ressep == "1":
     ressep = float(ressep)
     # final potential file name
@@ -74,8 +79,8 @@ else:
                     candidates.append([a,b,c,d])
     candidates = np.asarray(candidates)
 
-
-smrat = 100 ## a smoothing of 100 points, that is 1 in Gr curve
+# a smoothing of 100 points, that is 1 in Gr curve
+smrat = 100 
 targetX,targetY = np.genfromtxt(tag).T
 targetY = smooth(targetY,smrat)
 targetN = len(targetX)
@@ -100,24 +105,11 @@ def getCurEnergy():
     ycal2 = smooth(ycal,smrat)
     return np.mean((targetY-ycal2)**2)
 
-### noisyopt start    
-#objcount=0
-#def paraToMoment(x):
-#    global objcount
-#    objcount+=1
-#    if objcount%100==0:
-#        print(objcount)
-#    a = x[0]
-#    b = x[1]
-#    c = x[2]
-#    d = x[3]
-#    lib.c_assignAndRun(a,b,c,d)
-#    return getCurMoment()
+# =============================================================================
+# noisy optimization part    
+# =============================================================================
+
 def obj(x):
-    #global objcount
-    #objcount+=1
-    #if objcount%100==0:
-    #    print(objcount)
     a = x[0]
     b = x[1]
     c = x[2]
@@ -125,36 +117,37 @@ def obj(x):
     lib.c_assignAndRun(a,b,c,d)
     return getCurEnergy()
     
-### calculate for all candidates in list "candidates"
-### this part is suitable for parallel computing
-### parallel computing needed to be adjusted individually
+# calculate for all candidates in list "candidates"
+# this part is suitable for parallel computing
+# parallel computing needed to be adjusted individually
+print("ISS for %s begin."%snsec)
 for pnumcon in MCStrategyRng:
-#for pnumcon in [20000,50000,100000]:
     canN = len(candidates)
-    print("iteration:%i,N:%i"%(pnumcon,canN))
+    print("iterating --- #conformations for each candiates:%i, candidates remain:%i "%(
+          pnumcon,canN))
     lib.c_setNumConfigs(pnumcon)
     
     canM1 = np.zeros(canN)
     for ican in range(canN):
         canM1[ican]= obj(candidates[ican])
     
-    canN2 = int(0.25*canN)  ### selection ratio is 0.25
+    canN2 = int(0.25*canN)  # selection ratio is 0.25
     if canN2 == 0:
         canN2 = 1
     argcan2 = canM1.argsort()[:canN2]
     candidates = candidates[argcan2]
-    ### out of loop when only one remains
+    # out of loop when only one remains
     if canN2 == 1: 
         break
 
-print(argcan2)
 canM1 = canM1[argcan2]
-print(canM1)
-print(candidates)
-### if already outside the loop and multiple ramain, choose the best one
-np.savetxt(resfile,candidates[0].reshape(1,4))
 
+# if already outside the loop and multiple candidates ramain, choose the best one
+np.savetxt(resfile,candidates[0].reshape(1,4))
+print("ISS for %s success. Estimated result: %f %f %f %f"%(
+    snsec,candidates[0],candidates[1],candidates[2],candidates[3]))
     
-    
-    
+# =============================================================================    
+# end
+# =============================================================================    
     

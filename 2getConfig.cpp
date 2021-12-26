@@ -54,10 +54,10 @@ void findStepSize()
         //cout<<count;
         
         successrate = float(successcount)/float(each_step*global_npart);
-        printf("%d trials, scaling: %lf, successrate : %lf \n",each_step,scaling,successrate);
+        //printf("%d trials, scaling: %lf, successrate : %lf \n",each_step,scaling,successrate);
         if(successrate<0.5)break;
     }    
-    printf("final result: scaling: %lf, successrate : %lf \n",scaling,successrate);
+    //printf("final result: scaling: %lf, successrate : %lf \n",scaling,successrate);
     global_scaling = scaling;
 }
 
@@ -393,7 +393,7 @@ fclose(fptr);
 global_temperature=1;
 global_LJpara = 0.8*(global_boxr-global_boxl)/float(global_npart);
 global_LJpara = round(global_LJpara*1)/1.0;
-printf("LJpara is %lf\n",global_LJpara);
+//printf("LJpara is %lf\n",global_LJpara);
 
 findStepSize();
 //global_scaling=162;

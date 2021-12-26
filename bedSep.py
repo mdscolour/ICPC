@@ -10,9 +10,9 @@ import numpy as np
 #from sklearn.cluster import KMeans
 #import sklearn.cluster.k_means_
 
-def bedSep(bedfilename="./ExpNum.bed"):
+def bedSep(chrRng,bedfilename="./ExpNum.bed"):
 #if sys.argv[1] == "bedSep":
-    global chrRng    
+    #global chrRng    
 
     i=0    
     for iPath in range(1):
@@ -48,7 +48,7 @@ def bedSep(bedfilename="./ExpNum.bed"):
                     #if i==10:
                     #    break          
             wfile.close()
-    print("'bedSep' success. Read entry:",i," Maximum read position:",amx)
+    print("File separation success. Read entry:",i," Maximum read position:",amx)
                 
 if __name__ == '__main__':
     ### global variable
@@ -59,7 +59,7 @@ if __name__ == '__main__':
     os.system("mv *.bed ExpNum.bed") 
     
 
-    bedSep() ### got _chrX.like_bed from ExpNum.bed
+    bedSep(chrRng) ### got _chrX.like_bed from ExpNum.bed
 
 
 

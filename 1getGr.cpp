@@ -49,8 +49,8 @@ void getCanGr(int itarea,const char *nchr,const char *likebedname,const char *fp
     }
     MMC.readyEverything();
     lenpartcount /= npartcount;
-    cout<<npartcount<<endl;
-    cout<<lenpartcount<<endl;
+    //cout<<npartcount<<endl;
+    //cout<<lenpartcount<<endl;
     fclose(fptr);
 
     char bufferpre[50];

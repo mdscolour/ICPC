@@ -49,7 +49,7 @@ fclose(fptrpara);
 // global_epsilon=1;
 // global_a=14;
 // global_b=13;
-printf("chr%s %s %lf %lf %lf %lf\n",argv[2],argv[1],global_sigma,global_epsilon, global_a, global_b);
+printf("Start generating conformations for chr%s-%s: %lf %lf %lf %lf\n",argv[2],argv[1],global_sigma,global_epsilon, global_a, global_b);
 
 coreDirectRun::loadTarget(grname);//not actually needed
 coreDirectRun::readConfig(lowname);
