@@ -1,6 +1,8 @@
 # Intra-Chromosomal Potential Calculator (ICPC)
 This is the program to extract the intra-chromosomal potentials from nucleosomal positioning data.
 The obtained results are effective potentials for single nucleosomes, which represent the organization mechanism for that specific section and can serve as a status identifier for further study.
+## Related publication
+[https://arxiv.org/abs/2112.11785](http://www.picb.ac.cn/hanlab/iNPS.html)
 ## Dependencies
 numpy, scipy
 some optional function may need pandas
@@ -40,5 +42,3 @@ The algorithm is organized in the following step:
 * Computing configurations and compressibilities
 (* Classification)
 Code of the classification is not included here.
-## Related publication
-[https://arxiv.org/abs/2112.11785](http://www.picb.ac.cn/hanlab/iNPS.html)
