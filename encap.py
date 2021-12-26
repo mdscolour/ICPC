@@ -1,24 +1,6 @@
 #! /remote/gpu05/anaconda3/bin/python3
 # -*- coding: utf-8 -*-
 
-#####
-"""
-This is the program that can extract the intra-chromosomal potentials from nucleosomal positioning data.
-The obtained are effective potential for single nucleosomes, which represent the organization mechanism for that specific section and can serve as a status identifier for further study.
-
-Details in: https://arxiv.org/abs/2112.11785
-
-The steps are:
-Preparing iNPS data (iNPS program not included)
-Obtaining RDF data
-Running simulations to obtain the parameters
-Computing configurations and compressibilities
-
-This is the file to control and run all the functions
-See "__main__" part
-"""
-#####
-
 import os
 import sys
 import copy
@@ -111,7 +93,7 @@ def getGrAndConfig(chrRngT,target_file_pathT,seclen=50000,inclen=25000):
 
 ### submitting tasks to the ITP clusters
 ### to run and get the potential, the .finres file.
-### changing computational accuracy need to change "candidates" in file "runV10.py".
+### changing computational accuracy need to change "candidates" in file "runISS.py".
 def submitquest(Chromosome,secrng): 
     os.chdir("chr%s"%Chromosome)
     for i in secrng:
@@ -282,7 +264,7 @@ if __name__ == '__main__':
     
     ### submit tasks for all sections to ITP cluster
     ### for calculate the optimized potential
-    ### change accuracy need to change here (namesubfix) and file "runV10.py"
+    ### change accuracy need to change here (namesubfix) and file "runISS.py"
     #namesubfix="finres01" 
     #submitAllMissing(namesubfix)
     

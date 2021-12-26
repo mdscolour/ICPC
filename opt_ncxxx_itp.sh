@@ -50,7 +50,7 @@ cp ${cptarget5} .
 cp ${cptarget6} .
 
 g++ -fPIC -shared -o cdll.so cdll.cpp
-./runV10.py xxx
+./runISS.py xxx
 #cp *finres $cpback1
 #./runNoOpt.py xxx
 

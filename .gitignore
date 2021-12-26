@@ -13,3 +13,4 @@ plot*
 *.pdf
 *.so
 *.like_bed
+.DS_Store
