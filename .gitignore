@@ -14,3 +14,4 @@ plot*
 *.so
 *.like_bed
 .DS_Store
+__pycache__

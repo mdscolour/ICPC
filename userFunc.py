@@ -12,31 +12,18 @@ from matplotlib.collections import BrokenBarHCollection
 import scipy.cluster.hierarchy as shc
 from sklearn.cluster import AgglomerativeClustering
 import matplotlib as mpl 
-#from pylab import *
 
-#######preparation of .like_bed file, .bed file is needed
+### preparation of .like_bed file, .bed file is needed
 def quickBedSep():
     os.system("./0bedSep.py") 
     
-def getGrAndConfig(chrRngT,target_file_pathT,seclen=50000,inclen=25000):
-    for Chromosome in chrRngT:   
+def getGrAndConfig(target_file_pathT,seclen=50000,inclen=25000):
+    global chrRng
+    global chrLength
+    for iChromosome in range(len(chrRng)):  
+        Chromosome = chrRng[iChromosome] 
         ### set maximum length
-        if Chromosome == '1':	
-            maxlen=3188341
-        if Chromosome == '2':
-            maxlen=2231883
-        if Chromosome == '3':	
-            maxlen=1799298
-        if Chromosome == '4':	
-            maxlen=1603259
-        if Chromosome == '5':	
-            maxlen=1190845
-        if Chromosome == '6':	
-            maxlen=1033292
-        if Chromosome == '7':	
-            maxlen=949511
-        if Chromosome == 'R':	
-            maxlen=2286237
+        maxlen = chrLength[iChromosome]
         
         maxsection = int(maxlen/seclen);
         if maxsection*seclen+inclen > maxlen:
@@ -49,7 +36,7 @@ def getGrAndConfig(chrRngT,target_file_pathT,seclen=50000,inclen=25000):
         ### create .midgrpre and .preconfig. Run in the main folder.
         target_file = "%s/_chr%s.like_bed"%(target_file_pathT,Chromosome)
         ### compile
-        os.system("g++ 1getGr.cpp")
+        os.system("g++ -o 1getGr.out 1getGr.cpp")
         ### create folders if not exist
         try:
             os.system("mkdir chr%s"%Chromosome)
@@ -60,15 +47,15 @@ def getGrAndConfig(chrRngT,target_file_pathT,seclen=50000,inclen=25000):
         ### i.e. in range(0,1000,5). Stepsize 5 is according to data quality.
         ### 1000 is decided by the scale of interest. The change of 
         ### these two paremeters need to go into 1getGr.cpp in function getCanGr() 
-        os.system("./a.out %s %d %s chr%s %d %d"%
+        os.system("./1getGr.out %s %d %s chr%s %d %d"%
         (Chromosome,maxsection,target_file,Chromosome,seclen,inclen))
         
         #if False:
         ### from .preconfig to .lowconfig. Run in the subfolder.
-        os.system("g++ 2getConfig.cpp")
+        os.system("g++ -o 2getConfig.out 2getConfig.cpp")
         os.chdir("chr%s"%Chromosome)
         for ita in range(maxsection):
-            os.system("../a.out %d %s"%(ita,Chromosome))
+            os.system("../2getConfig.out %d %s"%(ita,Chromosome))
         #os.chdir("..")
         
         #if False:
@@ -132,22 +119,22 @@ def submitAllMissing(namesubfix="finres"):
 
 ### calculate conformations for all sections
 ### it will temporarily change the result file name
-def calConformation(namesubfix="finres"):
-    os.system("g++ 5getConfor.cpp")
+def calConformation(namesubfix="finres",mcs=100000):
+    os.system("g++ -o 5getConfor.out 5getConfor.cpp")
     #chrRng = ['R'] 
     #chrRng = ['1','2','3','4','5','6','7','R'] 
     global chrRng
     
     for ichr in chrRng:
         os.chdir("chr%s"%ichr)
-        isecrng = [int(f[5:-6]) for f in os.listdir() if f.endswith(".midgr")]
-        #isecrng = [int(f[5:-9]) for f in os.listdir() if f.endswith(".finres01")]
+        isecrng = [int(f.split(".")[0].split("-")[1]
+                  ) for f in os.listdir() if f.endswith(namesubfix)]
         isecrng.sort()
-        #print(isecrng)
+
         for i in isecrng:
             ### third parameter is the conformation number, times 10 is MSC
             #os.system("mv chr%s-%d.%s chr%s-%d.finrestmp"%(ichr,i,namesubfix,ichr,i))
-            os.system("../a.out %d %s 100000 confor %s"%(i,ichr,namesubfix))  
+            os.system("../5getConfor.out %d %s %d confor %s"%(i,ichr,mcs,namesubfix))  
             #os.system("mv chr%s-%d.finrestmp chr%s-%d.%s"%(ichr,i,ichr,i,namesubfix)) 
         os.chdir("..")
 
@@ -218,8 +205,7 @@ def calCompressibility(nameout="compress.out"):
     #chrRng = ['1'] 
     for ichr in chrRng:
         os.chdir("chr%s"%ichr)
-        isecrng = [int(f[5:-6]) for f in os.listdir() if f.endswith(".midgr")]
-        #isecrng = [int(f[5:-9]) for f in os.listdir() if f.endswith(".finres01")]
+        isecrng = [int(f[5:-7]) for f in os.listdir() if f.endswith(".confor")]
         isecrng.sort()
         #print(isecrng)
         
@@ -239,8 +225,45 @@ def calCompressibility(nameout="compress.out"):
         ffin.close() 
         os.chdir("..")
         
+### combine the data into one file    
+def summarizeAllValue(namesubfix,namecompress,namerespot="Potential01_100000.like_bed"):  
+    res=[]
+    global chrRng
+    #chrRng = ['R']#,'7','6','5','4','3','2','1'] 
+    #chrRng = ['R','7','6','5','4','3','2','1'][::-1] 
+    for ichr in chrRng:
+        os.chdir("chr%s"%ichr)
+        isecrng = [int(f.split(".")[0].split("-")[1]
+                  ) for f in os.listdir() if f.endswith(namesubfix)]
+        isecrng.sort()
+
+        tcom = np.genfromtxt(namecompress,skip_header=1)
+        
+        for ipat in isecrng:
+            cLoc = np.where(tcom[:,0]==ipat)
+            if len(cLoc)==0:
+                c = "n/a"
+            else:
+                c = tcom[cLoc[0][0],2]     
+            
+            try:
+                #pat = "chr%s-%d.finres01"%(ichr,ipat)
+                pat = "chr%s-%d.%s"%(ichr,ipat,namesubfix)
+                data = np.genfromtxt(pat)
+                res.append(["chr%s"%ichr,12500+50000*ipat,75000+50000*ipat,ipat]+np.ravel(data)[:4].tolist()+[c])
+            except:
+                print("error reading of chr. %s data %d "%(ichr,ipat))
+                pass
+        os.chdir("..")
+            
+    #res = np.asarray(res).astype(float)
+    print("length",len(res))
+    #print(res)
+    pd.DataFrame(res).to_csv(namerespot,sep="\t",index=False,header=None)
     
-if __name__ == '__main__':
+    
+       
+#if __name__ == '__main__':
     ### get iNPS data, here is only a function for chromosome separation
     #quickBedSep() ### separate _chrX.like_bed from .bed file
     
@@ -251,7 +274,7 @@ if __name__ == '__main__':
     ### change section length need to change here
     #chrRng = ['1','2','3','4','5','6','7','R']
     #target_file_path = "/scratch/li/MolecularMC/candida"
-    #getGrAndConfig(chrRng,target_file_path,50000,25000)
+    #getGrAndConfig(target_file_path,50000,25000)
     
     
     

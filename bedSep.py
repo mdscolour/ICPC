@@ -10,9 +10,10 @@ import numpy as np
 #from sklearn.cluster import KMeans
 #import sklearn.cluster.k_means_
 
-def bedSep():
-    global chrRng    
+def bedSep(bedfilename="./ExpNum.bed"):
 #if sys.argv[1] == "bedSep":
+    global chrRng    
+
     i=0    
     for iPath in range(1):
         #chrRng = ['2L','2R','3L','3R','X','4']
@@ -31,7 +32,7 @@ def bedSep():
             wfile.write('Seperated for each chromosome\n')
             amx=0
             
-            with open("./ExpNum.bed")as f:      ## name
+            with open(bedfilename)as f:      ## name
                 for line in f:
                     dataline = line.strip().split()
                     
