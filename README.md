@@ -40,6 +40,9 @@ The algorithm is organized in the following steps:
 * Obtaining RDF data
 * Running simulations to obtain potential parameters
 * Computing configurations and compressibilities
+
 In the paper there is a further step:
 * Classification
-But code of the classification is not included here.
+
+While code of the classification is not included here
+but it is already well explained in the paper.
