@@ -1,6 +1,24 @@
 #! /remote/gpu05/anaconda3/bin/python3
 # -*- coding: utf-8 -*-
 
+#####
+"""
+This is the program that can extract the intra-chromosomal potentials from nucleosomal positioning data.
+The obtained are effective potential for single nucleosomes, which represent the organization mechanism for that specific section and can serve as a status identifier for further study.
+
+Details in: https://arxiv.org/abs/2112.11785
+
+The steps are:
+preparing iNPS data (iNPS program not included)
+obtaining RDF data
+intuitive selection strategy to obtain the parameters
+compute configurations and compressibilities
+
+This is the file to control and run all the functions
+See "__main__" part
+"""
+#####
+
 import os
 import sys
 import copy
@@ -13,12 +31,6 @@ import scipy.cluster.hierarchy as shc
 from sklearn.cluster import AgglomerativeClustering
 import matplotlib as mpl 
 #from pylab import *
-
-#####
-"""
-this is file to control and run all the function
-See "__main__" part
-"""
 
 #######preparation of .like_bed file, .bed file is needed
 def quickBedSep():
