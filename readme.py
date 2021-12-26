@@ -9,10 +9,10 @@ The obtained are effective potential for single nucleosomes, which represent the
 Details in: https://arxiv.org/abs/2112.11785
 
 The steps are:
-preparing iNPS data (iNPS program not included)
-obtaining RDF data
-intuitive selection strategy to obtain the parameters
-compute configurations and compressibilities
+Preparing iNPS data (iNPS program not included)
+Obtaining RDF data
+Running simulations to obtain the parameters
+Computing configurations and compressibilities
 
 This is the file to control and run all the functions
 See "__main__" part
