@@ -40,7 +40,8 @@ cog = "%s.lowconfig"%snsec
 
 ### generating all candidates
 ### accuracy can be changed here!
-resfile = "%s.finres01"%snsec #final potential file name
+ressep = 0.1
+resfile = "%s.finres%.1f"%(snsec,ressep) #final potential file name
 
 #candidates = []
 #for c in np.arange(2,21,1):
@@ -50,16 +51,16 @@ resfile = "%s.finres01"%snsec #final potential file name
 #                candidates.append([a,b,c,d])
 #candidates = np.asarray(candidates)
 
-oldresfile = "%s.finres02"%snsec
+oldresfile = "%s.finres1"%snsec
+
 oldres = np.ravel(np.genfromtxt(oldresfile))[:4]
 candidates = []
-for c in np.arange(max(2,oldres[2]-2),oldres[2]+2,0.1):
-    for d in np.arange(max(1,c-3),c,0.1):
+for c in np.arange(max(2,oldres[2]-5),oldres[2]+5,ressep):
+    for d in np.arange(max(1,c-3),c,ressep):
         for a in [oldres[0]]:
-            for b in np.arange(1,17,0.1):
+            for b in np.arange(1,17,ressep):
                 candidates.append([a,b,c,d])
 candidates = np.asarray(candidates)
-
 
 smrat = 100 ## a smoothing of 100 points, that is 1 in Gr curve
 targetX,targetY = np.genfromtxt(tag).T
@@ -114,7 +115,7 @@ def obj(x):
 ### calculate for all candidates in list "candidates"
 ### this part is suitable for parallel computing
 ### parallel computing needed to be adjusted individually
-for pnumcon in [50,100,200,500,1000,5000,10000,20000,50000,100000]:
+for pnumcon in [100,200,500,1000,5000,10000,20000,50000,100000]:
 #for pnumcon in [20000,50000,100000]:
     canN = len(candidates)
     print("iteration:%i,N:%i"%(pnumcon,canN))

@@ -36,8 +36,10 @@ char finresname[50];
 
 sprintf(grname, "chr%s-%s.midgr", argv[2],argv[1]);
 sprintf(lowname, "chr%s-%s.lowconfig",argv[2],argv[1]);
-sprintf(conforname, "chr%s-%s.confor",argv[2],argv[1]);
-sprintf(finresname, "chr%s-%s.finrestmp",argv[2],argv[1]);
+sprintf(conforname, "chr%s-%s.%s",argv[2],argv[1],argv[4]);
+//sprintf(conforname, "chr%s-%s.confor",argv[2],argv[1]);
+sprintf(finresname, "chr%s-%s.%s",argv[2],argv[1],argv[5]);
+//sprintf(finresname, "chr%s-%s.finres01",argv[2],argv[1]);
 
 FILE *fptrpara = fopen(finresname, "r");
 while(fscanf(fptrpara, "%lf %lf %lf %lf\n", 
@@ -47,7 +49,7 @@ fclose(fptrpara);
 // global_epsilon=1;
 // global_a=14;
 // global_b=13;
-printf("%lf %lf %lf %lf\n", global_sigma,global_epsilon, global_a, global_b);
+printf("chr%s %s %lf %lf %lf %lf\n",argv[2],argv[1],global_sigma,global_epsilon, global_a, global_b);
 
 coreDirectRun::loadTarget(grname);//not actually needed
 coreDirectRun::readConfig(lowname);
@@ -66,7 +68,8 @@ coreDirectRun::readyToRun();
     //const char* saveGrName="res/chr2-0.gr";
     //double spacing;
     
-    int num_configs=15000;//coreDirectRun::global_num_configs;
+    //int num_configs=100000;//coreDirectRun::global_num_configs;
+    int num_configs=atoi(argv[3]);
     int num_steps=10;//coreDirectRun::global_num_steps;
     int init_step=5000;//coreDirectRun::global_init_step;
     MMC.run(init_step);
@@ -82,8 +85,8 @@ coreDirectRun::readyToRun();
         MMC.run(num_steps);
         nsteps+=num_steps;
                 
-        if(i%1000==0)
-        printf("configuration %d in %d....done.\n",i,num_configs);
+        //if(i%1000==0)
+        //printf("configuration %d in %d....done.\n",i,num_configs);
 
         //fprintf(fptr, "%d\n\n",npart);
         for(int i=0;i<npart;i++){
