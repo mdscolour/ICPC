@@ -35,10 +35,11 @@ optimization part" in the file "runISS.py".
 At the end it will generate a potential*.like_bed file as 
 final result.
 ## Algorithm Structure:
-The algorithm is organized in the following step:
+The algorithm is organized in the following steps:
 * Preparing [iNPS](https://www.nature.com/articles/ncomms5909) data ([iNPS program is here](http://www.picb.ac.cn/hanlab/iNPS.html))
 * Obtaining RDF data
 * Running simulations to obtain potential parameters
 * Computing configurations and compressibilities
-(* Classification)
-Code of the classification is not included here.
+In the paper there is a further step:
+* Classification
+But code of the classification is not included here.
