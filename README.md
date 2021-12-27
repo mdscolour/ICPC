@@ -4,8 +4,9 @@ The obtained results are effective potentials for single nucleosomes, which repr
 ## Related publication
 [https://arxiv.org/abs/2112.11785](http://www.picb.ac.cn/hanlab/iNPS.html)
 ## Dependencies
-numpy, scipy
-some optional function may need pandas
+NumPy, SciPy
+
+Some optional function may need pandas
 ## Usage
 ### Test Run
 A test run with example data:
