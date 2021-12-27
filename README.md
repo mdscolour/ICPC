@@ -13,7 +13,7 @@ A test run with example data:
 ```
 python3 testRun.py exampleData/GSM1542419_chr1.bed
 ```
-Normally this will takes about 90 minutes. 
+Normally this will take about 90 minutes. 
 
 A success run will generate a potential*.like_bed file as final result.
 ### Normal Run
@@ -21,7 +21,7 @@ A normal run:
 ```
 python3 normalRun.py bed_file_name.bed
 ```
-Directly run this will takes about 120 hours.
+Directly run this will take about 120 hours.
 
 And this is only for the first section in chr. 1.
 
