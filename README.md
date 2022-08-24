@@ -2,7 +2,7 @@
 This is the program to extract the intra-chromosomal potentials from nucleosomal positioning data.
 The obtained results are effective potentials for single nucleosomes, which represent the organization mechanism for that specific section and can serve as a status identifier for further study.
 ## Related publication
-[https://link.springer.com/article/10.1140/epje/s10189-022-00185-3](Li, K., Oiwa, N.N., Mishra, S.K. et al. Inter-nucleosomal potentials from nucleosomal positioning data. Eur. Phys. J. E 45, 33 (2022). https://doi.org/10.1140/epje/s10189-022-00185-3)
+[Li, K., Oiwa, N.N., Mishra, S.K. et al. Inter-nucleosomal potentials from nucleosomal positioning data. Eur. Phys. J. E 45, 33 (2022). https://doi.org/10.1140/epje/s10189-022-00185-3](https://link.springer.com/article/10.1140/epje/s10189-022-00185-3)
 ## Dependencies
 NumPy, SciPy
 
