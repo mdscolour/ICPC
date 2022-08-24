@@ -2,7 +2,7 @@
 This is the program to extract the intra-chromosomal potentials from nucleosomal positioning data.
 The obtained results are effective potentials for single nucleosomes, which represent the organization mechanism for that specific section and can serve as a status identifier for further study.
 ## Related publication
-[https://arxiv.org/abs/2112.11785](http://www.picb.ac.cn/hanlab/iNPS.html)
+[https://link.springer.com/article/10.1140/epje/s10189-022-00185-3](Li, K., Oiwa, N.N., Mishra, S.K. et al. Inter-nucleosomal potentials from nucleosomal positioning data. Eur. Phys. J. E 45, 33 (2022). https://doi.org/10.1140/epje/s10189-022-00185-3)
 ## Dependencies
 NumPy, SciPy
 
@@ -27,7 +27,7 @@ And this is only for the first section in chr. 1.
 
 Change the blocked code in the part "Run ISS" in file "normalRun.py" 
 according to specific device or cluster to allow parallel computing 
-for multiply sections to make the calculation of the whole 
+for multiple sections to make the calculation of the whole 
 genome affordable.
 
 Further time reduction is possible by changing the "noisy 
